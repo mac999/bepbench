@@ -1,0 +1,377 @@
+# Korean display overlay for the ISO 19650-2 framework.
+# Ids, option values and rules stay canonical — only labels are translated.
+name: ISO 19650-2 BIM 실행계획서 (BEP)
+description: >
+  BS EN ISO 19650-2 및 UK BIM Framework 지침에 따른 수행자(delivery team) BIM 실행계획서.
+  입찰 단계의 사전 BEP와 착수 전 발주자가 요구하는 상세 수준을 모두 포함합니다.
+
+maturity_bands:
+  - { label: "초기",   note: "프로젝트 표지 수준. 공유 불가." }
+  - { label: "초안",   note: "구조는 있으나 내용이 부족합니다." }
+  - { label: "정의됨", note: "핵심 약속은 기술되었으나 실행 상세가 미흡합니다." }
+  - { label: "관리됨", note: "감사 가능한 수준. 사전 BEP로 제출 가능합니다." }
+  - { label: "최적화", note: "완결·근거·측정 가능. 착수 준비 완료." }
+
+sections:
+  project_information:
+    title: 프로젝트 정보
+    intent: 프로젝트와 참여 주체, 그리고 본 계획서의 개정 이력을 식별합니다.
+    guidance: >
+      이후의 모든 산출물 이름이 여기 입력한 값을 따릅니다. 프로젝트 번호와 발주자명은
+      계약서와 정확히 일치해야 합니다.
+    fields:
+      project_name: { label: 프로젝트명 }
+      project_number: { label: 프로젝트 번호, help: 모든 정보 컨테이너 이름의 첫 번째 구성요소로 사용됩니다. }
+      appointing_party: { label: 발주자 (Appointing Party) }
+      lead_appointed_party: { label: 총괄수행자 (Lead Appointed Party) }
+      project_stage: { label: 현재 단계 }
+      bep_status: { label: BEP 상태 }
+      project_description:
+        label: 프로젝트 개요 및 범위
+        help: 자산 유형, 규모, 위치, 계약 방식, 본 계약의 업무 범위를 기술합니다.
+      revision_history:
+        label: 개정 이력
+        columns:
+          revision: 개정
+          date: 일자
+          author: 작성자
+          summary: 변경 내용
+          approved_by: 승인자
+  objectives_uses:
+    title: BIM 목표 및 활용(Uses)
+    intent: 정보를 왜 모델링하는지, 그리고 팀이 수행을 약속하는 BIM 활용을 명시합니다.
+    guidance: >
+      측정 수단이 없는 목표는 구호에 불과합니다. 각 목표를 마일스톤에서 증빙할 수 있는
+      지표에 연결하고, 모든 BIM 활용에 담당 태스크팀을 지정하십시오.
+    fields:
+      bim_goals:
+        label: 프로젝트 정보 목표
+        help: 발주자가 본 프로젝트의 정보를 통해 달성하려는 바를 기술합니다.
+      bim_uses:
+        label: 합의된 BIM 활용
+        help: 희망 목록이 아니라 본 수행팀이 실제로 수행할 활용만 기재합니다.
+        columns:
+          use: BIM 활용
+          priority: 우선순위
+          owner: 담당 태스크팀
+          stage: 적용 단계
+          output: 산출물 / 증빙
+      success_measures:
+        label: 성과 지표(KPI)
+        columns:
+          measure: 지표
+          target: 목표값
+          method: 측정 방법
+          frequency: 주기
+      value_case: { label: 기대 효과 및 제약, help: 해당 활용으로 절감·저감되는 바와 그 한계를 기술합니다. }
+  team_roles:
+    title: 수행팀 및 책임
+    intent: 정보관리 업무 수행자와 승인 권한자를 지정합니다.
+    guidance: >
+      ISO 19650은 직책이 아니라 기능(function)을 배정합니다. 아래의 모든 기능은 대리자를
+      포함한 실명으로 지정되어야 하며, 그렇지 않으면 감사에서 즉시 지적됩니다.
+    fields:
+      org_structure: { label: 수행팀 구성, help: 총괄수행자, 태스크팀, 계약 체계를 기술합니다. }
+      key_roles:
+        label: 정보관리 기능
+        columns:
+          function: 기능
+          organisation: 소속
+          name: 담당자 실명
+          contact: 연락처
+          deputy: 대리자
+      task_teams:
+        label: 태스크팀 및 업무범위
+        columns:
+          team: 태스크팀
+          discipline: 공종
+          scope: 정보 범위
+          lead: 태스크팀 관리자
+      raci:
+        label: 주요 정보 활동 RACI
+        columns:
+          activity: 활동
+          responsible: 실행(R)
+          accountable: 책임(A)
+          consulted: 협의(C)
+          informed: 통보(I)
+      capability_summary: { label: 수행팀 역량·가용자원 요약 }
+  information_requirements:
+    title: 정보요구사항 (EIR 대응)
+    intent: 교환정보요구사항(EIR)을 검토·매핑하고 항목별로 답변했음을 제시합니다.
+    guidance: >
+      발주자가 가장 먼저 보는 섹션입니다. 모든 EIR 조항에 대해 준수·조건부 준수·
+      예외 제안 중 하나로 명시적으로 답변해야 합니다.
+    fields:
+      reference_documents:
+        label: 근거 요구사항 문서
+        columns:
+          document: 문서
+          reference: 문서번호 / 개정
+          issued_by: 발행 주체
+          date: 일자
+      eir_response:
+        label: EIR 조항별 대응
+        columns:
+          clause: EIR 조항
+          requirement: 요구사항
+          response: 대응
+          how: 충족 방법 / 사유
+      information_purposes: { label: 정보의 목적 및 의사결정 시점, help: 제출 정보가 지원하는 발주자 의사결정과 그 시점을 기술합니다. }
+      loin:
+        label: 정보요구수준 (LOIN)
+        columns:
+          element: 요소 / 시스템
+          stage: 단계
+          lod: 상세수준(LOD)
+          ifc_class: IFC 클래스
+          geometry: 형상 상세수준
+          alphanumeric: 속성 정보
+          documentation: 첨부 문서
+          owner: 작성 주체
+  delivery_strategy:
+    title: 정보납품 전략 (MIDP / TIDP)
+    intent: 무엇을, 누가, 어느 마일스톤에, 어떤 형식으로 납품하는지 정의합니다.
+    guidance: >
+      MIDP는 각 태스크팀 TIDP의 통합본입니다. 여기의 마일스톤 일자가 공정표와 맞지 않으면
+      실행 불가능한 계획입니다. 숨기지 말고 명시하십시오.
+    fields:
+      milestones:
+        label: 정보납품 마일스톤
+        columns:
+          milestone: 마일스톤
+          stage: 단계
+          date: 일자
+          purpose: 목적 / 지원 의사결정
+          acceptance: 인수 기준
+      tidp_summary:
+        label: 태스크팀별 TIDP 요약
+        columns:
+          team: 태스크팀
+          container: 정보 컨테이너
+          format: 형식
+          milestone: 납품 마일스톤
+          author: 작성자
+          reviewer: 검토자
+      midp_approach: { label: MIDP 통합 및 유지관리, help: TIDP 통합, 기준선 설정, 공정 변경 시 재발행 절차. }
+      mobilisation: { label: 착수(Mobilisation) 계획, help: 생산 착수 전 정보생산 방법·CDE·자원의 시험 검증. }
+  cde_workflow:
+    title: 공통데이터환경(CDE) 및 워크플로
+    intent: 단일 진실 원천과 그 상태, 상태 전이 기준을 정의합니다.
+    guidance: >
+      플랫폼명, 플랫폼 운영 주체, 그리고 컨테이너가 WIP → 공유 → 발행으로 넘어가는
+      정확한 게이트를 명시하십시오. 이 부분의 모호함이 CDE 감사 실패의 주원인입니다.
+    fields:
+      cde_platform: { label: CDE 플랫폼 및 운영 주체 }
+      cde_states:
+        label: 컨테이너 상태 및 전이 기준
+        columns:
+          state: 상태
+          purpose: 목적
+          entry: 진입 기준
+          approver: 전이 승인자
+      naming_convention: { label: 정보 컨테이너 명명 규칙 }
+      status_codes:
+        label: 상태 코드 및 개정 코드
+        columns:
+          code: 코드
+          meaning: 의미
+          suitability: 사용 가능 범위
+      access_permissions: { label: 접근 권한 체계 }
+      archiving: { label: 아카이빙 및 보존 }
+  standards_methods:
+    title: 정보 표준·방법·절차
+    intent: 채택 표준과 이를 강제하는 생산 절차를 기술합니다.
+    fields:
+      standards_adopted:
+        label: 채택 표준
+        columns:
+          standard: 표준
+          version: 버전 / 연도
+          application: 적용 대상
+      classification: { label: 분류체계 }
+      production_methods: { label: 정보생산 방법 및 절차, help: 모델링 절차, 템플릿, 공유 매개변수, 도면 생산 및 검수. }
+      reference_material:
+        label: 참조정보 및 공유자원
+        columns:
+          resource: 자원
+          source: 출처 / 관리자
+          location: 위치
+      deviation_process: { label: 예외 및 면제 처리 절차 }
+  modelling_federation:
+    title: 모델 구조 및 통합(Federation) 전략
+    intent: 모델 분할, 좌표계 정합, 통합 방식을 정의합니다.
+    fields:
+      model_breakdown:
+        label: 모델 분할 구조
+        columns:
+          model: 모델
+          discipline: 공종
+          volume: 구역 / 존
+          author: 작성자
+          software: 저작 소프트웨어
+      coordinate_system: { label: 좌표계 및 측량 기준, help: 기준점, 측량점, 그리드, 수준원점, 단위 및 공유 원점 합의사항. }
+      federation_strategy: { label: 통합 모델 전략 }
+      file_naming_models: { label: 모델 파일 및 객체 명명 }
+      model_limits: { label: 모델 용량·분할·성능 기준 }
+  coordination_quality:
+    title: 간섭조정 및 품질보증
+    intent: 정보가 인수 가능해지기까지의 검토·간섭·승인 절차를 정의합니다.
+    guidance: >
+      컨테이너 공유 전 세 가지 검사가 요구됩니다: 모델 무결성, 표준 준수, 정보 내용.
+      각 검사의 수행자와 증빙 방법을 명시하십시오.
+    fields:
+      coordination_cycle: { label: 간섭조정 주기 }
+      clash_matrix:
+        label: 간섭검토 매트릭스 및 허용오차
+        columns:
+          test: 검토 항목
+          discipline_a: 공종 A
+          discipline_b: 공종 B
+          tolerance: 허용오차
+          priority: 우선순위
+      qa_checks:
+        label: 공유 전 품질보증 검사
+        columns:
+          check: 검사
+          method: 방법 / 도구
+          responsible: 수행자
+          frequency: 주기
+          evidence: 증빙 기록
+      issue_management: { label: 이슈 및 코멘트 관리, help: BCF 워크플로, 이슈 담당자, 처리 기한, 에스컬레이션. }
+      authorisation: { label: 검토 및 승인 절차 }
+  technology:
+    title: 기술 및 교환 형식
+    intent: 소프트웨어 버전과 상호운용 경로를 확정합니다.
+    fields:
+      software_stack:
+        label: 소프트웨어 및 버전
+        columns:
+          purpose: 용도
+          software: 소프트웨어
+          version: 버전
+          used_by: 사용 주체
+      exchange_formats:
+        label: 교환 형식
+        columns:
+          exchange: 교환 대상
+          format: 형식
+          schema: 스키마 / MVD
+          validation: 검증 방법
+      interoperability: { label: 상호운용 위험 및 대응 }
+      infrastructure: { label: 하드웨어·네트워크·라이선스 }
+  collaboration:
+    title: 협업 및 의사소통
+    intent: 수행팀의 정렬을 유지하는 회의 주기와 소통 채널을 정합니다.
+    fields:
+      meetings:
+        label: 회의 일정
+        columns:
+          meeting: 회의
+          frequency: 주기
+          chair: 주재자
+          attendees: 참석자
+          output: 산출물
+      communication_channels: { label: 소통 채널 및 에스컬레이션 }
+      decision_log: { label: 의사결정 기록 }
+  security:
+    title: 정보보안
+    intent: 자산 민감도에 비례하는 보안 중심 접근방식을 적용합니다.
+    fields:
+      security_triage: { label: 보안 분류(Triage) 결과 }
+      classification_scheme:
+        label: 정보 등급 및 취급 기준
+        columns:
+          classification: 등급
+          examples: 적용 대상
+          handling: 취급 규칙
+      access_control: { label: 접근 통제 및 제3자 공유 }
+      incident_response: { label: 유출·사고 대응 }
+  handover:
+    title: 인계 및 자산정보
+    intent: 운영 주체가 인수할 정보와 그 형식을 정의합니다.
+    fields:
+      air_response: { label: 자산정보요구사항(AIR) 대응 }
+      handover_deliverables:
+        label: 인계 산출물
+        columns:
+          deliverable: 산출물
+          format: 형식
+          responsible: 담당
+          milestone: 기한
+      cobie_strategy: { label: 구조화 데이터 / COBie 전략 }
+      as_built_process: { label: 준공 검증 절차 }
+  risk:
+    title: 정보관리 리스크 등록부
+    intent: 납품을 저해할 수 있는 정보 리스크를 담당자·대응방안과 함께 기록합니다.
+    fields:
+      risk_register:
+        label: 리스크 등록부
+        columns:
+          risk: 리스크
+          impact: 영향도
+          likelihood: 발생가능성
+          mitigation: 대응 방안
+          owner: 담당자
+          review_date: 검토 일자
+      risk_process: { label: 리스크 검토 절차 }
+  training:
+    title: 역량 및 교육
+    intent: 평가된 역량과 요구 역량의 격차를 해소합니다.
+    fields:
+      competence_assessment: { label: 역량 평가 요약 }
+      training_plan:
+        label: 교육 계획
+        columns:
+          topic: 주제
+          audience: 대상
+          provider: 제공 기관
+          date: 목표 일자
+  approval:
+    title: 부속서 및 승인
+    intent: 첨부자료와 서명으로 문서를 확정합니다.
+    fields:
+      appendices:
+        label: 부속서
+        columns:
+          ref: 번호
+          title: 제목
+          location: 위치 / 링크
+      agreement_notes: { label: 합의된 단서 및 전제 }
+      signatories:
+        label: 승인 서명자
+        columns:
+          name: 성명
+          role: 역할
+          organisation: 소속
+          date: 일자
+
+checks:
+  uses_have_owners:
+    message: "합의된 모든 BIM 활용에는 이를 수행할 담당 태스크팀이 지정되어야 합니다."
+    fix: "‘BIM 목표 및 활용’ 섹션에서 담당 태스크팀 열을 채우십시오."
+  uses_have_evidence:
+    message: "산출물이 명시되지 않은 BIM 활용은 마일스톤에서 검증할 수 없습니다."
+  milestones_dated:
+    message: "일자가 없는 납품 마일스톤은 공정 반영과 감사가 불가능합니다."
+  milestones_acceptance:
+    message: "인수 기준이 없으면 납품물의 인수 또는 반려를 판단할 수 없습니다."
+  roles_named:
+    message: "정보관리 기능은 조직명이 아니라 담당자 실명으로 지정되어야 합니다."
+  risks_owned:
+    message: "담당자가 없는 리스크는 관리되지 않는 리스크입니다."
+  eir_all_answered:
+    message: "각 EIR 조항 대응에는 충족 방법 또는 사유가 필요합니다."
+  security_triage_done:
+    message: "계획서 발행 전 ISO 19650-5 보안 분류를 완료해야 합니다."
+  loin_covers_milestones:
+    message: "정보요구수준(LOIN)이 정의된 요소가 너무 적어 생산 지침으로 사용할 수 없습니다."
+  tidp_teams_covered:
+    message: "수행팀에 선언된 모든 태스크팀은 TIDP 요약에 나타나야 합니다."
+    fix: "각 태스크팀에 대한 TIDP 행을 추가하거나, 산출물이 없는 팀은 제외하십시오."
+  uses_owner_known:
+    message: "수행팀 구성에 없는 팀에 BIM 활용이 배정되어 있습니다."
+  software_covers_models:
+    message: "모델 분할 구조의 저작 소프트웨어가 기술 스택 목록에 없습니다."
+  approval_signed:
+    message: "BEP에는 발주자와 총괄수행자 양측의 서명자가 필요합니다."

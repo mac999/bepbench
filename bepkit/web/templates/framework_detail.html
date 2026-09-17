@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ framework.name }} — {{ app_name }}{% endblock %}
+{% block body %}
+<div class="wrap" style="max-width:920px">
+  <a class="muted" style="font-size:12.5px" href="{{ url_for('web.frameworks') }}">← {{ t('frameworks.title') }}</a>
+  <h1 style="margin-top:8px">{{ framework.name }}</h1>
+  <p class="dim" style="max-width:720px">{{ framework.description }}</p>
+  <div class="row rowwrap" style="gap:6px;margin-bottom:20px">
+    <span class="pill">v{{ framework.version }}</span>
+    <span class="pill">{{ framework.sections|length }} {{ t('common.sections') }}</span>
+    <span class="pill">{{ framework.total_fields }} {{ t('common.fields') }}</span>
+    <span class="pill">{{ framework.checks|length }} {{ t('common.checks') }}</span>
+  </div>
+
+  {% for section in framework.sections %}
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-head">
+        <span class="eyebrow">{{ '%02d'|format(loop.index) }}</span>
+        <h2 class="grow">{{ section.title }}</h2>
+        <span class="pill">{{ t('frameworks.weight') }} {{ section.weight }}</span>
+      </div>
+      <div class="card-body" style="padding:12px 18px">
+        {% if section.intent %}<p class="muted" style="font-size:13px">{{ section.intent }}</p>{% endif %}
+        <table class="report">
+          <thead>
+            <tr>
+              <th>{{ t('common.field') }}</th>
+              <th style="width:110px">Type</th>
+              <th style="width:80px;text-align:right">{{ t('common.required') }}</th>
+              <th style="width:80px;text-align:right">{{ t('frameworks.weight') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for field in section.fields %}
+              <tr>
+                <td>{{ field.label }}{% if field.quality.min_words %} <span class="muted">· {{ field.quality.min_words }}w</span>{% endif %}{% if field.quality.min_rows %} <span class="muted">· {{ field.quality.min_rows }} rows</span>{% endif %}</td>
+                <td class="muted">{{ field.type }}</td>
+                <td class="num">{{ '●' if field.required else '—' }}</td>
+                <td class="num">{{ field.weight }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endfor %}
+
+  {% if framework.checks %}
+    <div class="card">
+      <div class="card-head"><h2>{{ t('frameworks.rules') }}</h2></div>
+      <div class="card-body">
+        {% for check in framework.checks %}
+          <div class="issue" data-sev="{{ check.severity }}">
+            <span class="sev"></span>
+            <div>{{ check.message }}<div class="detail">{{ check.rule }} · {{ check.section }}</div></div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

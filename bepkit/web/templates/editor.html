@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% from "_field.html" import render as render_field %}
+{% block title %}{{ section.title }} — {{ project.name }}{% endblock %}
+{% block body_class %}app-shell{% endblock %}
+{% block menubar %}{% include "_menubar.html" %}{% endblock %}
+{% block topnav %}<button class="btn ghost sm" data-toggle-nav title="{{ t('menu.toggle_nav') }}" aria-label="{{ t('menu.toggle_nav') }}">☰</button>{% endblock %}
+{% block crumbs %}{% include "_project_tabs.html" %}{% endblock %}
+
+{% block body %}
+<div class="workspace triple" data-editor data-slug="{{ project.slug }}" data-section="{{ section.id }}"
+     data-lod-field="{{ lod_field }}" data-lod-column="{{ lod_spec.get('column', '') }}"
+     data-strings='{{ {
+       "complete": t("editor.state.complete"),
+       "partial": t("editor.state.partial"),
+       "empty": t("editor.state.empty"),
+       "saving": t("editor.save.saving"),
+       "saved": t("editor.save.saved"),
+       "error": t("editor.save.error"),
+       "no_issues": t("editor.no_issues"),
+       "no_gaps": t("editor.no_gaps"),
+       "ai_working": t("ai.working"),
+       "ai_offline": t("ai.offline"),
+       "ai_review": t("ai.review_note"),
+       "ai_critique_only": t("ai.critique_only"),
+       "viewer_uploading": t("viewer.uploading"),
+       "viewer_unsupported": t("viewer.unsupported"),
+       "viewer_shown": t("viewer.shown"),
+       "viewer_elements": t("viewer.elements"),
+       "viewer_truncated": t("viewer.truncated"),
+       "viewer_delete": t("viewer.delete"),
+       "viewer_nothing": t("viewer.nothing_selected"),
+       "viewer_loading": t("viewer.uploading"),
+       "props_none": t("props.none"),
+       "props_bep": t("props.bep_requirement"),
+       "props_no_bep": t("props.no_bep_match"),
+       "tree_empty": t("tree.empty"),
+       "tree_all": t("tree.all"),
+       "ids_checking": t("ids.checking"),
+       "ids_result": t("ids.result"),
+       "ids_none": t("ids.none")
+     } | tojson }}'>
+
+  {% include "_project_nav.html" %}
+
+  <main class="pane-bep" style="min-width:0">
+    <form method="post" action="{{ url_for('web.save_section', slug=project.slug, section_id=section.id) }}">
+      <div class="card">
+        <div class="card-head">
+          <div class="grow">
+            <div class="eyebrow">{{ t('common.section') }} {{ '%02d'|format(section_number) }}{% if section.reference %} · {{ section.reference }}{% endif %}</div>
+            <h2 style="margin-top:2px">{{ section.title }}</h2>
+          </div>
+          <span class="save-state" data-save-state data-state="saved">
+            <span class="dot"></span><span class="text">{{ t('editor.save.saved') }}</span>
+          </span>
+        </div>
+
+        <div class="card-body">
+          {% if section.intent %}<p class="section-intent">{{ section.intent }}</p>{% endif %}
+          {% if section.guidance %}
+            <div class="guidance" style="margin:12px 0 4px">{{ section.guidance }}</div>
+          {% endif %}
+
+          {% for field in section.fields %}
+            {{ render_field(section, field, values.get(field.id),
+                            section_score.fields | selectattr('field_id', 'equalto', field.id) | first) }}
+          {% endfor %}
+        </div>
+
+        <div class="card-head" style="border-top:1px solid var(--line-2);border-bottom:0">
+          {% if prev_section %}
+            <a class="btn sm" href="{{ url_for('web.editor', slug=project.slug, section_id=prev_section.id) }}">← {{ t('editor.prev') }}</a>
+          {% endif %}
+          <span class="grow"></span>
+          <noscript><button class="btn sm" type="submit">{{ t('editor.nojs_save') }}</button></noscript>
+          <span class="muted" style="font-size:11.5px"><kbd>⌘S</kbd> {{ t('editor.shortcut_save') }}</span>
+          {% if next_section %}
+            <a class="btn primary sm" data-next-section
+               href="{{ url_for('web.editor', slug=project.slug, section_id=next_section.id) }}">{{ t('editor.next') }} →</a>
+          {% else %}
+            <a class="btn primary sm" href="{{ url_for('web.score', slug=project.slug) }}">{{ t('project.score') }} →</a>
+          {% endif %}
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <div class="splitter" data-splitter="left" role="separator" aria-orientation="vertical"
+       tabindex="0" aria-label="Resize the plan panel"></div>
+
+  <section class="pane-model sticky">
+    <div class="card">{% include "_viewer_panel.html" %}</div>
+  </section>
+
+  <div class="splitter" data-splitter="right" role="separator" aria-orientation="vertical"
+       tabindex="0" aria-label="Resize the properties panel"></div>
+
+  <aside class="pane-right sticky">
+    <div class="card">
+      <div class="tabs">
+        <button class="tab on" type="button" data-tab="properties">{{ t('tab.properties') }}</button>
+        <button class="tab" type="button" data-tab="assessment">{{ t('tab.assessment') }}</button>
+      </div>
+      <div class="tab-panel" data-tab-panel="properties">
+        {% include "_properties_panel.html" %}
+      </div>
+      <div class="tab-panel" data-tab-panel="assessment" hidden>
+        {% include "_rail_body.html" %}
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+  window.BEP_VIEWER_CONFIG_URL = "{{ url_for('api.viewer_settings') }}";
+</script>
+<script src="{{ url_for('static', filename='vendor/three.min.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/viewer.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/assist.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/workspace.js') }}" defer></script>
+{% endblock %}

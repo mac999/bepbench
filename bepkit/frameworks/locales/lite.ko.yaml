@@ -1,0 +1,65 @@
+name: BEP 라이트 (소규모 / 패스트트랙)
+description: >
+  소규모 또는 패스트트랙 계약을 위한 한 자리에서 끝내는 BEP. 현장의 실제 행동을 바꾸는
+  약속만 남겼습니다 — 누가 무엇을, 무엇을 주고받고, 어디에 두며, 어떻게 검수하는가.
+  계약 범위가 커지면 ISO 19650 프레임워크로 전환하십시오.
+
+maturity_bands:
+  - { label: "초기",   note: "아직 사용할 수 없습니다." }
+  - { label: "사용가능", note: "소규모 공사를 시작하기에 충분합니다." }
+  - { label: "합의됨", note: "소규모 계약의 확정 범위." }
+  - { label: "완결",   note: "미결 사항이 없습니다." }
+
+sections:
+  basics:
+    title: 프로젝트 기본정보
+    fields:
+      project_name: { label: 프로젝트명 }
+      client: { label: 발주자 }
+      lead: { label: 총괄 수행사 }
+      scope: { label: 본 계약의 업무 범위 }
+  goals:
+    title: BIM 적용 목적
+    fields:
+      objectives: { label: 목표 }
+      uses:
+        label: BIM 활용
+        columns: { use: 활용, owner: 담당, output: 산출물 }
+  people:
+    title: 인원
+    fields:
+      team:
+        label: 역할 분담
+        columns: { role: 역할, name: 성명, organisation: 소속, contact: 연락처 }
+  deliverables:
+    title: 납품물
+    fields:
+      deliverables_table:
+        label: 납품물 및 기한
+        columns: { deliverable: 납품물, format: 형식, author: 작성자, date: 기한 }
+      lod_note: { label: 요구 상세수준 }
+  working:
+    title: 작업 방식
+    fields:
+      cde: { label: 파일 보관 위치 }
+      naming: { label: 파일 명명 규칙 }
+      software:
+        label: 소프트웨어 및 버전
+        columns: { software: 소프트웨어, version: 버전, used_by: 사용 주체 }
+      coordination: { label: 간섭조정 및 검수 }
+      meetings: { label: 회의 주기 }
+  closeout:
+    title: 종료
+    fields:
+      handover: { label: 준공 시 발주자 인계물 }
+      risks:
+        label: 주요 리스크
+        columns: { risk: 리스크, mitigation: 대응, owner: 담당 }
+      signoff:
+        label: 합의 서명
+        columns: { name: 성명, organisation: 소속, date: 일자 }
+
+checks:
+  uses_owned: { message: "모든 BIM 활용에는 담당자가 필요합니다." }
+  deliverables_dated: { message: "납품물에는 기한이 필요합니다." }
+  deliverable_authors_known: { message: "인원 표에 없는 사람에게 납품물이 배정되어 있습니다." }

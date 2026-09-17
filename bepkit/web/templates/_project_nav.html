@@ -1,0 +1,16 @@
+{# Left rail: section list with live completion state. #}
+<aside class="sidenav sticky">
+  <div class="card" style="padding:10px">
+    <div class="nav-title eyebrow">{{ t('editor.sections') }}</div>
+    {% for s in framework.sections %}
+      {% set sscore = report.section(s.id) %}
+      <a class="nav-item {{ 'active' if section and s.id == section.id }}"
+         href="{{ url_for('web.editor', slug=project.slug, section_id=s.id) }}">
+        <span class="idx">{{ '%02d'|format(loop.index) }}</span>
+        <span class="nav-dot" data-nav-dot="{{ s.id }}" data-state="{{ sscore.state }}"></span>
+        <span class="label">{{ s.title }}</span>
+        <span class="pct" data-nav-pct="{{ s.id }}">{{ sscore.score|round|int }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</aside>

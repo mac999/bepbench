@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% from "_macros.html" import ring, bar, issue_row, gate_pill %}
+{% block title %}{{ t('score.title') }} — {{ project.name }}{% endblock %}
+{% block menubar %}{% include "_menubar.html" %}{% endblock %}
+{% block crumbs %}{% include "_project_tabs.html" %}{% endblock %}
+
+{% block body %}
+<div class="wrap">
+  <h1 style="margin-bottom:16px">{{ t('score.title') }}</h1>
+
+  <div class="card pad">
+    <div class="row rowwrap" style="gap:26px;align-items:center">
+      {{ ring(report.score, 'lg', t('score.overall')) }}
+      <div class="grow" style="min-width:240px">
+        <div class="row rowwrap" style="gap:8px">
+          <span class="pill accent">{{ report.maturity_label }}</span>
+          {{ gate_pill(report) }}
+          <span class="pill">{{ report.framework_name }}</span>
+          <span class="pill {{ 'accent' if report.stage == 'pre_appointment' }}">{{ t('stage.' ~ (report.stage or 'delivery')) }}</span>
+        </div>
+        <p class="dim" style="margin:10px 0 0">{{ report.maturity_note }}</p>
+        {% if report.next_band %}
+          <p class="muted" style="margin:4px 0 0;font-size:12.5px">
+            {{ t('score.next_band') }} <b>{{ report.next_band.label }}</b>: +{{ '%.1f'|format(report.next_band.gap) }} {{ t('common.points') }}
+          </p>
+        {% endif %}
+      </div>
+      <div style="min-width:210px">
+        <div class="kv" style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0">
+          <span class="muted">{{ t('score.coverage') }}</span><b>{{ report.coverage|round|int }}%</b>
+        </div>
+        {{ bar(report.coverage) }}
+        <div class="kv" style="display:flex;justify-content:space-between;font-size:13px;padding:10px 0 4px">
+          <span class="muted">{{ t('score.required') }}</span><b>{{ report.required_coverage|round|int }}%</b>
+        </div>
+        {{ bar(report.required_coverage) }}
+        <div class="muted" style="font-size:12px;margin-top:10px">
+          {{ report.fields_filled }} / {{ report.fields_total }} {{ t('common.fields') }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;margin-top:16px" class="score-grid">
+    <div>
+      <div class="card">
+        <div class="card-head"><h2>{{ t('score.section_table') }}</h2></div>
+        <div class="card-body" style="padding:6px 10px 10px">
+          <table class="report">
+            <thead>
+              <tr>
+                <th>{{ t('common.section') }}</th>
+                <th style="width:130px"></th>
+                <th style="width:66px;text-align:right">{{ t('common.score') }}</th>
+                <th style="width:80px;text-align:right">{{ t('common.coverage') }}</th>
+                <th style="width:74px;text-align:right">{{ t('common.required') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in report.sections %}
+                <tr>
+                  <td><a href="{{ url_for('web.editor', slug=project.slug, section_id=s.id) }}">{{ s.title }}</a></td>
+                  <td>{{ bar(s.score) }}</td>
+                  <td class="num">{{ s.score|round|int }}</td>
+                  <td class="num">{{ s.coverage|round|int }}%</td>
+                  <td class="num">{{ s.required_complete }}/{{ s.required_total }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>{{ t('score.issues') }}</h2>
+          <span class="muted" style="font-size:12px">
+            {{ report.issue_counts().blocker }} · {{ report.issue_counts().major }} · {{ report.issue_counts().minor }}
+          </span>
+        </div>
+        <div class="card-body">
+          {% if report.issues %}
+            {% for issue in report.issues %}{{ issue_row(issue, project.slug) }}{% endfor %}
+          {% else %}
+            <p class="muted" style="margin:0">{{ t('score.no_issues') }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-head"><h2>{{ t('score.recommendations') }}</h2></div>
+        <div class="card-body">
+          {% if report.recommendations %}
+            {% for rec in report.recommendations %}
+              <div class="rec">
+                <span class="pts">+{{ '%.1f'|format(rec.points) }}</span>
+                <div>
+                  <a href="{{ url_for('web.editor', slug=project.slug, section_id=rec.section_id) }}#field-{{ rec.path.split('.')[1] }}">{{ rec.label }}</a>
+                  <div class="muted" style="font-size:11.5px">{{ rec.section_title }} — {{ rec.detail }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="muted" style="margin:0">{{ t('editor.no_gaps') }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>{{ t('score.snapshots') }}</h2></div>
+        <div class="card-body">
+          {% if snapshots %}
+            <a class="btn sm" style="margin-bottom:12px"
+               href="{{ url_for('web.diff', slug=project.slug) }}">{{ t('menu.diff') }} →</a>
+          {% endif %}
+          <form method="post" action="{{ url_for('web.create_snapshot', slug=project.slug) }}" class="row" style="margin-bottom:12px">
+            <input class="input" name="label" placeholder="{{ t('score.snapshot_label') }}">
+            <button class="btn" type="submit">{{ t('score.take_snapshot') }}</button>
+          </form>
+          {% if snapshots %}
+            {% for snapshot in snapshots %}
+              <div class="row" style="padding:7px 0;border-top:1px dashed var(--line);font-size:12.5px">
+                <div class="grow">
+                  <div style="font-weight:550">{{ snapshot.label }}</div>
+                  <div class="muted">{{ snapshot.created_at|relative_time }} · {{ snapshot.maturity_label }}</div>
+                </div>
+                <b style="font-variant-numeric:tabular-nums">{{ snapshot.score|round|int }}</b>
+                <form method="post" action="{{ url_for('web.restore_snapshot', slug=project.slug, snapshot_id=snapshot.id) }}">
+                  <button class="btn ghost sm" type="submit">{{ t('score.restore') }}</button>
+                </form>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="muted" style="margin:0;font-size:12.5px">{{ t('score.no_snapshots') }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card pad">
+        <div class="eyebrow">{{ t('score.how') }}</div>
+        <p class="muted" style="font-size:12.5px;margin:6px 0 0;line-height:1.6">{{ t('score.how.body') }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<style>@media (max-width: 960px) { .score-grid { grid-template-columns: minmax(0,1fr) !important; } }</style>
+{% endblock %}

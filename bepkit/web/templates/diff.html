@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% from "_macros.html" import bar %}
+{% block title %}{{ t('diff.title') }} — {{ project.name }}{% endblock %}
+{% block menubar %}{% include "_menubar.html" %}{% endblock %}
+{% block crumbs %}{% include "_project_tabs.html" %}{% endblock %}
+
+{% block body %}
+<div class="wrap">
+  <h1 style="margin-bottom:6px">{{ t('diff.title') }}</h1>
+  <p class="muted" style="margin:0 0 18px">{{ t('diff.subtitle') }}</p>
+
+  <form class="card pad row rowwrap" method="get" style="gap:10px;margin-bottom:16px">
+    <label class="row" style="gap:6px;margin:0">
+      <span class="muted" style="font-size:12.5px">{{ t('diff.from') }}</span>
+      <select class="input" name="before" style="width:auto" onchange="this.form.submit()">
+        {% for s in snapshots %}
+          <option value="{{ s.id }}" {{ 'selected' if s.id == before_id }}>
+            {{ s.label }} · {{ s.score|round|int }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <label class="row" style="gap:6px;margin:0">
+      <span class="muted" style="font-size:12.5px">{{ t('diff.to') }}</span>
+      <select class="input" name="after" style="width:auto" onchange="this.form.submit()">
+        <option value="current" {{ 'selected' if not after_id }}>{{ t('diff.current') }}</option>
+        {% for s in snapshots %}
+          <option value="{{ s.id }}" {{ 'selected' if s.id == after_id }}>
+            {{ s.label }} · {{ s.score|round|int }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <span class="grow"></span>
+    <noscript><button class="btn sm" type="submit">{{ t('diff.compare') }}</button></noscript>
+  </form>
+
+  <div class="card pad">
+    <div class="row rowwrap" style="gap:24px;align-items:center">
+      <div>
+        <div class="eyebrow">{{ report.label_before }}</div>
+        <div style="font-size:30px;font-weight:700;letter-spacing:-.03em">{{ report.score_before|round|int }}</div>
+      </div>
+      <div style="font-size:22px;color:var(--ink-3)">→</div>
+      <div>
+        <div class="eyebrow">{{ report.label_after }}</div>
+        <div style="font-size:30px;font-weight:700;letter-spacing:-.03em">{{ report.score_after|round|int }}</div>
+      </div>
+      <div>
+        <span class="pill {{ 'ok' if report.score_delta > 0 else ('bad' if report.score_delta < 0 else '') }}"
+              style="font-size:14px;padding:6px 14px">
+          {{ '%+.1f'|format(report.score_delta) }}
+        </span>
+      </div>
+      <div class="muted" style="font-size:12.5px;margin-left:auto">
+        {{ report.counts()['added'] }} {{ t('diff.added') }} ·
+        {{ report.counts()['changed'] }} {{ t('diff.changed') }} ·
+        {{ report.counts()['removed'] }} {{ t('diff.removed') }}
+      </div>
+    </div>
+  </div>
+
+  {% if report.sections %}
+    {% for section in report.sections %}
+      <div class="card" style="margin-top:14px">
+        <div class="card-head">
+          <h2 class="grow">{{ section.title }}</h2>
+          <span class="muted" style="font-size:12.5px">{{ section.score_before|round|int }} → {{ section.score_after|round|int }}</span>
+          <span class="pill {{ 'ok' if section.score_delta > 0 else ('bad' if section.score_delta < 0 else '') }}">
+            {{ '%+.1f'|format(section.score_delta) }}
+          </span>
+        </div>
+        <div class="card-body" style="padding:6px 18px 14px">
+          {% for change in section.changes %}
+            <div class="diff-row" data-status="{{ change.status }}">
+              <span class="diff-mark">{{ {'added':'+','removed':'−','changed':'~'}[change.status] }}</span>
+              <div class="grow">
+                <a href="{{ url_for('web.editor', slug=project.slug, section_id=change.section_id) }}#field-{{ change.field_id }}">{{ change.label }}</a>
+                {% if change.detail %}<span class="muted" style="font-size:12px"> — {{ change.detail }}</span>{% endif %}
+                {% if change.status == 'changed' and change.type in ('markdown', 'textarea', 'text') %}
+                  <div class="diff-text">
+                    <div class="old">{{ change.before|string|truncate(320) }}</div>
+                    <div class="new">{{ change.after|string|truncate(320) }}</div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="card empty-state" style="margin-top:14px">
+      <div class="big">{{ t('diff.none') }}</div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

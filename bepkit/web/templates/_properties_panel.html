@@ -1,0 +1,26 @@
+{# Right pane: the model's object tree, what is selected, and what the BEP
+   demands of it. #}
+<div class="tree-head">
+  <span class="eyebrow grow">{{ t('tree.title') }}</span>
+  <span class="seg" role="group">
+    <button type="button" data-tree-group="storey" class="on">{{ t('tree.by_storey') }}</button>
+    <button type="button" data-tree-group="class">{{ t('tree.by_class') }}</button>
+  </span>
+</div>
+<div style="padding:0 12px 8px">
+  <input class="input tree-filter" data-tree-filter placeholder="{{ t('tree.filter') }}">
+</div>
+<div class="tree" data-tree>
+  <div class="tree-empty">{{ t('tree.empty') }}</div>
+</div>
+
+<div class="props" data-props>
+  <div class="rail-section">
+    <div class="eyebrow">{{ t('viewer.selected') }}</div>
+    <div data-props-head class="muted" style="font-size:12.5px;margin-top:6px">
+      {{ t('viewer.nothing_selected') }}
+    </div>
+  </div>
+  <div data-props-bep hidden class="rail-section"></div>
+  <div data-props-body></div>
+</div>

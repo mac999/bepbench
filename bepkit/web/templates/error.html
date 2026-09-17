@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} — {{ app_name }}{% endblock %}
+{% block body %}
+<div class="wrap">
+  <div class="empty-state">
+    <div class="big">{{ code }}</div>
+    <p>{{ message }}</p>
+    <a class="btn" href="{{ url_for('web.dashboard') }}">Back to projects</a>
+  </div>
+</div>
+{% endblock %}

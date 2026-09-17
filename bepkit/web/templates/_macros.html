@@ -1,0 +1,37 @@
+{# Reusable presentation fragments. #}
+
+{% macro ring(value, size='md', label='') %}
+  <div class="ring {{ size }} tone-{{ value|score_tone }}" data-value="{{ '%.1f'|format(value) }}"
+       style="--value: {{ '%.1f'|format(value) }}" role="img"
+       aria-label="{{ label or 'Score' }} {{ value|round|int }} out of 100">
+    <span class="val">{{ value|round|int }}</span>
+  </div>
+{% endmacro %}
+
+{% macro bar(value) %}
+  <div class="bar"><i class="tone-{{ value|score_tone }}" style="width: {{ '%.1f'|format(value) }}%"></i></div>
+{% endmacro %}
+
+{% macro gate_pill(report) %}
+  {% if report.is_ready %}
+    <span class="pill ok" data-gate>Ready to issue</span>
+  {% elif report.blockers %}
+    <span class="pill bad" data-gate>{{ report.issue_counts().blocker }} blocking, {{ report.issue_counts().major }} major</span>
+  {% else %}
+    <span class="pill warn" data-gate>{{ report.issue_counts().major }} major open</span>
+  {% endif %}
+{% endmacro %}
+
+{% macro issue_row(issue, slug=None) %}
+  <div class="issue" data-sev="{{ issue.severity }}">
+    <span class="sev"></span>
+    <div>
+      {% if slug and issue.section_id %}
+        <a href="{{ url_for('web.editor', slug=slug, section_id=issue.section_id) }}">{{ issue.section_title or issue.section_id }}</a> —
+      {% endif %}
+      {{ issue.message }}
+      {% if issue.detail %}<div class="detail">{{ issue.detail }}</div>{% endif %}
+      {% if issue.fix %}<div class="detail">Fix: {{ issue.fix }}</div>{% endif %}
+    </div>
+  </div>
+{% endmacro %}

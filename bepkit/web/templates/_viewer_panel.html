@@ -1,0 +1,42 @@
+{# Right-hand IFC canvas: render modes, LOD filtering and element inspection. #}
+<div class="viewer-shell" data-viewer-shell>
+  <div class="viewer-bar">
+    <span class="seg" data-viewer-modes></span>
+    <button class="btn ghost sm" data-viewer-fit title="{{ t('viewer.fit') }}">⤢</button>
+    <label class="row" style="gap:5px;font-size:11.5px;margin:0">
+      <input type="checkbox" data-viewer-section> {{ t('viewer.section') }}
+    </label>
+    <input type="range" min="0" max="100" value="100" data-viewer-section-level
+           style="width:80px" disabled aria-label="{{ t('viewer.section') }}">
+    <span class="grow"></span>
+    <button class="btn sm" data-viewer-upload>{{ t('viewer.upload') }}</button>
+    <input type="file" accept=".ifc" data-viewer-file hidden>
+  </div>
+
+  <div class="lod-note">
+    <div class="row" style="gap:8px;flex-wrap:wrap">
+      <span class="eyebrow">{{ t('viewer.lod') }}</span>
+      <span class="lod-strip" data-lod-strip></span>
+      <label class="row" style="gap:5px;font-size:11px;margin:0">
+        <input type="checkbox" data-lod-sync checked> {{ t('viewer.lod_sync') }}
+      </label>
+    </div>
+    <div style="margin-top:6px" data-lod-note></div>
+  </div>
+
+  <div class="viewer-canvas" data-viewer-canvas>
+    <div class="viewer-overlay interactive" data-viewer-overlay>
+      <div>
+        <div class="drop-zone" data-viewer-drop style="pointer-events:auto;cursor:pointer">
+          {{ t('viewer.drop') }}
+        </div>
+        <div class="muted" style="font-size:11.5px">{{ t('viewer.none') }}</div>
+      </div>
+    </div>
+    <div class="viewer-hud" data-viewer-hud hidden></div>
+  </div>
+
+  <div class="class-chips" data-viewer-classes hidden></div>
+
+  <div data-viewer-models></div>
+</div>

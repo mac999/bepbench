@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ t('settings.title') }} — {{ project.name }}{% endblock %}
+{% block menubar %}{% include "_menubar.html" %}{% endblock %}
+{% block crumbs %}{% include "_project_tabs.html" %}{% endblock %}
+
+{% block body %}
+<div class="wrap" style="max-width:780px">
+  <h1 style="margin-bottom:16px">{{ t('settings.title') }}</h1>
+
+  <div class="card">
+    <div class="card-head"><h2>{{ t('settings.details') }}</h2></div>
+    <form class="card-body stack" method="post" action="{{ url_for('web.update_settings', slug=project.slug) }}">
+      <div class="grid2">
+        <div>
+          <label class="lbl">{{ t('dash.name') }}</label>
+          <input class="input" name="name" value="{{ project.name }}" required>
+        </div>
+        <div>
+          <label class="lbl">{{ t('dash.client') }}</label>
+          <input class="input" name="client" value="{{ project.client }}">
+        </div>
+        <div>
+          <label class="lbl">{{ t('dash.reference') }}</label>
+          <input class="input" name="reference" value="{{ project.reference }}">
+        </div>
+        <div>
+          <label class="lbl">{{ t('dash.owner') }}</label>
+          <input class="input" name="owner" value="{{ project.owner }}">
+        </div>
+        <div>
+          <label class="lbl">{{ t('common.status') }}</label>
+          <select class="input" name="status">
+            {% for value in ['draft', 'in review', 'issued', 'archived'] %}
+              <option value="{{ value }}" {{ 'selected' if project.status == value }}>{{ value }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="lbl">{{ t('dash.stage') }}</label>
+          <select class="input" name="stage">
+            {% for value in ['delivery', 'pre_appointment'] %}
+              <option value="{{ value }}" {{ 'selected' if project.stage == value }}>{{ t('stage.' ~ value) }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="lbl">{{ t('dash.framework') }}</label>
+          <input class="input" value="{{ framework.name }}" disabled>
+        </div>
+      </div>
+      <div>
+        <label class="lbl">{{ t('settings.notes') }}</label>
+        <textarea class="input" name="notes" rows="4">{{ project.notes }}</textarea>
+      </div>
+      <div><button class="btn primary" type="submit">{{ t('common.save') }}</button></div>
+    </form>
+  </div>
+
+  <div class="card pad">
+    <div class="row rowwrap">
+      <div class="grow">
+        <div style="font-weight:600">{{ t('settings.duplicate') }}</div>
+        <div class="muted" style="font-size:12.5px">{{ t('settings.duplicate_body') }}</div>
+      </div>
+      <form method="post" action="{{ url_for('web.duplicate_project', slug=project.slug) }}">
+        <button class="btn" type="submit">{{ t('settings.duplicate') }}</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card pad" style="border-color: color-mix(in srgb, var(--danger) 35%, var(--line))">
+    <div class="eyebrow" style="color:var(--danger)">{{ t('settings.danger') }}</div>
+    <p class="muted" style="font-size:12.5px;margin:6px 0 12px">{{ t('settings.delete_body') }}</p>
+    <form class="row rowwrap" method="post" action="{{ url_for('web.delete_project', slug=project.slug) }}">
+      <input class="input grow" name="confirm" placeholder="{{ t('settings.delete_confirm') }}: {{ project.slug }}">
+      <button class="btn danger" type="submit">{{ t('common.delete') }}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

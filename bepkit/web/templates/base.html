@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="{{ locale() }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ app_name }}{% endblock %}</title>
+  <meta name="description" content="{{ t('app.tagline') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231d6fa5'/><text x='16' y='22' font-family='system-ui' font-size='14' font-weight='700' fill='white' text-anchor='middle'>B</text></svg>">
+  <script>
+    /* Set the theme before first paint to avoid a flash. */
+    (function () {
+      try { var t = localStorage.getItem("bep-theme"); if (t) document.documentElement.setAttribute("data-theme", t); } catch (e) {}
+    })();
+  </script>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('web.dashboard') }}">
+      <span class="mark">BEP</span>
+      <span>{{ app_name }}</span>
+    </a>
+    {% block menubar %}{% endblock %}
+    {% block crumbs %}{% endblock %}
+    <span class="spacer"></span>
+    <nav>
+      {% block topnav %}{% endblock %}
+      <a class="btn ghost sm" href="{{ url_for('web.frameworks') }}">{{ t('nav.frameworks') }}</a>
+      <span class="langs" role="group" aria-label="{{ t('nav.language') }}">
+        {% for code, label in locales.items() %}
+          <a href="{{ url_for('web.set_language', code=code, next=request.full_path) }}"
+             class="{{ 'on' if locale() == code else '' }}" hreflang="{{ code }}">{{ code|upper }}</a>
+        {% endfor %}
+      </span>
+      <button class="btn ghost sm" data-theme-toggle title="{{ t('nav.theme') }}" aria-label="{{ t('nav.theme') }}">◐</button>
+    </nav>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flashes" id="flashes">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      <script>setTimeout(function () { var f = document.getElementById("flashes"); if (f) f.remove(); }, 5000);</script>
+    {% endif %}
+  {% endwith %}
+
+  {% block body %}{% endblock %}
+
+  <script src="{{ url_for('static', filename='js/menu.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</body>
+</html>

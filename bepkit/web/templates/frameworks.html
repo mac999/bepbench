@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ t('frameworks.title') }} — {{ app_name }}{% endblock %}
+{% block body %}
+<div class="wrap">
+  <h1>{{ t('frameworks.title') }}</h1>
+  <p class="muted" style="margin:4px 0 20px;max-width:720px">{{ t('frameworks.subtitle') }}</p>
+
+  <div class="projects">
+    {% for framework in frameworks %}
+      <div class="card pad">
+        <div style="font-weight:650;font-size:15px">{{ framework.name }}</div>
+        <div class="muted" style="font-size:12px;margin-top:2px">v{{ framework.version }}{% if framework.reference %} · {{ framework.reference }}{% endif %}</div>
+        <p class="dim" style="font-size:13px;margin:10px 0 12px">{{ framework.description }}</p>
+        <div class="row rowwrap" style="gap:6px">
+          <span class="pill">{{ framework.sections|length }} {{ t('common.sections') }}</span>
+          <span class="pill">{{ framework.total_fields }} {{ t('common.fields') }}</span>
+          <span class="pill">{{ framework.checks|length }} {{ t('common.checks') }}</span>
+        </div>
+        <div style="margin-top:14px">
+          <a class="btn sm" href="{{ url_for('web.framework_detail', framework_id=framework.id) }}">{{ t('frameworks.view') }}</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,346 @@
+{
+  "_comment": "Default runtime settings. Override by pointing BEP_CONFIG at your own JSON file, or by placing bep.config.json in the working directory; values are deep-merged over these.",
+  "ai": {
+    "enabled": true,
+    "provider": "ollama",
+    "base_url": "http://localhost:11434",
+    "model": "qwen3:30b-instruct",
+    "fallback_models": [
+      "qwen3:30b-a3b",
+      "qwen3-vl:32b-instruct",
+      "qwen2.5:14b",
+      "llama3.1:8b"
+    ],
+    "timeout_seconds": 180,
+    "temperature": 0.35,
+    "top_p": 0.9,
+    "num_ctx": 16384,
+    "num_predict": 1400,
+    "context_answers": 10,
+    "context_chars_per_answer": 600,
+    "strip_think_tags": true,
+    "system_prompt": "You are a senior BIM information manager drafting sections of a BIM Execution Plan under ISO 19650. You write in the plain, committing register of a contract document: specific, checkable statements with named responsibilities, dates and tolerances. Never write filler such as 'TBD', 'as required' or 'industry best practice'. Never invent a fact that contradicts the project context you are given; where a fact is genuinely unknown, write a concrete placeholder in angle brackets such as <confirm with the appointing party> so the author can see exactly what to fill in. Return only the requested content, with no preamble, no headings and no explanation of what you did.",
+    "modes": {
+      "draft": "Draft this field from scratch for the project described above.",
+      "improve": "Rewrite the author's current text so it is specific and auditable. Keep every fact they stated; add the commitments a reviewer would expect to see. Do not pad the word count.",
+      "expand": "Keep the author's current text and extend it with the detail it is missing. Return the complete field, not just the addition.",
+      "critique": "Do not rewrite. List, as short bullets, exactly what an ISO 19650 auditor would reject in the current text and what is missing."
+    }
+  },
+  "viewer": {
+    "enabled": true,
+    "default_mode": "solid",
+    "transparency": 0.3,
+    "show_edges": true,
+    "background_light": "#eaeef2",
+    "background_dark": "#14171c",
+    "selection_colour": "#ff8c1a",
+    "max_elements": 20000,
+    "max_upload_mb": 200,
+    "deflection_tolerance": 0.008,
+    "modes": [
+      {
+        "id": "solid",
+        "label": "Solid",
+        "opacity": 1.0,
+        "wireframe": false,
+        "edges": true
+      },
+      {
+        "id": "transparent",
+        "label": "Transparent",
+        "opacity": 0.3,
+        "wireframe": false,
+        "edges": true
+      },
+      {
+        "id": "xray",
+        "label": "X-ray",
+        "opacity": 0.12,
+        "wireframe": false,
+        "edges": true
+      },
+      {
+        "id": "wireframe",
+        "label": "Wireframe",
+        "opacity": 1.0,
+        "wireframe": true,
+        "edges": false
+      },
+      {
+        "id": "shaded_edges",
+        "label": "Shaded + edges",
+        "opacity": 0.92,
+        "wireframe": false,
+        "edges": true
+      }
+    ],
+    "palette": {
+      "IfcWall": "#cfc7b6",
+      "IfcWallStandardCase": "#cfc7b6",
+      "IfcSlab": "#b9bec6",
+      "IfcRoof": "#9aa3ad",
+      "IfcCovering": "#ded6c6",
+      "IfcBeam": "#8da2b8",
+      "IfcColumn": "#7f93a8",
+      "IfcMember": "#8da2b8",
+      "IfcFooting": "#8a8f96",
+      "IfcPile": "#8a8f96",
+      "IfcStair": "#b0a58e",
+      "IfcStairFlight": "#b0a58e",
+      "IfcRamp": "#b0a58e",
+      "IfcWindow": "#7fc4e0",
+      "IfcCurtainWall": "#7fc4e0",
+      "IfcPlate": "#9dd4e8",
+      "IfcDoor": "#c99b6e",
+      "IfcRailing": "#9a9a9a",
+      "IfcFurnishingElement": "#c2a88a",
+      "IfcDuctSegment": "#59b58c",
+      "IfcDuctFitting": "#59b58c",
+      "IfcAirTerminal": "#59b58c",
+      "IfcPipeSegment": "#4f9dd4",
+      "IfcPipeFitting": "#4f9dd4",
+      "IfcValve": "#4f9dd4",
+      "IfcCableCarrierSegment": "#d6a23c",
+      "IfcCableSegment": "#d6a23c",
+      "IfcFlowTerminal": "#59b58c",
+      "IfcEnergyConversionDevice": "#d4705a",
+      "IfcSpace": "#8fd0c4",
+      "IfcSite": "#9bb08a",
+      "IfcBuildingElementProxy": "#a9a9a9",
+      "default": "#a8aeb6"
+    },
+    "lod": {
+      "default": "300",
+      "sync_with_section": true,
+      "_comment": "Each level lists the IFC classes that may appear at that level of development, and how they are drawn. 'geometry': mesh renders the tessellated solid; bbox renders the element's bounding box, which is how a LOD 100/200 massing model is meant to read.",
+      "levels": {
+        "100": {
+          "label": "LOD 100 — Symbolic massing",
+          "note": "Overall form, area, height and orientation only. Elements are shown as massing boxes.",
+          "geometry": "bbox",
+          "include": [
+            "IfcSite",
+            "IfcBuilding",
+            "IfcBuildingStorey",
+            "IfcSlab",
+            "IfcWall",
+            "IfcWallStandardCase",
+            "IfcRoof",
+            "IfcCurtainWall"
+          ]
+        },
+        "200": {
+          "label": "LOD 200 — Generic systems",
+          "note": "Generic elements with approximate size, shape, location and orientation.",
+          "geometry": "mesh",
+          "include": [
+            "IfcSite",
+            "IfcSlab",
+            "IfcWall",
+            "IfcWallStandardCase",
+            "IfcRoof",
+            "IfcColumn",
+            "IfcBeam",
+            "IfcStair",
+            "IfcStairFlight",
+            "IfcRamp",
+            "IfcCurtainWall",
+            "IfcFooting",
+            "IfcPile"
+          ]
+        },
+        "300": {
+          "label": "LOD 300 — Specific assemblies",
+          "note": "Specific elements accurate in size, shape, location and orientation. The normal coordination level.",
+          "geometry": "mesh",
+          "include": [
+            "IfcSite",
+            "IfcSlab",
+            "IfcWall",
+            "IfcWallStandardCase",
+            "IfcRoof",
+            "IfcColumn",
+            "IfcBeam",
+            "IfcMember",
+            "IfcStair",
+            "IfcStairFlight",
+            "IfcRamp",
+            "IfcCurtainWall",
+            "IfcPlate",
+            "IfcWindow",
+            "IfcDoor",
+            "IfcRailing",
+            "IfcCovering",
+            "IfcFooting",
+            "IfcPile",
+            "IfcDuctSegment",
+            "IfcPipeSegment",
+            "IfcCableCarrierSegment"
+          ]
+        },
+        "350": {
+          "label": "LOD 350 — Interfaces and connections",
+          "note": "Adds the parts needed for coordination with adjacent trades: supports, fittings, terminals.",
+          "geometry": "mesh",
+          "include": [
+            "*"
+          ],
+          "exclude": [
+            "IfcFurnishingElement",
+            "IfcFurniture",
+            "IfcSystemFurnitureElement",
+            "IfcSpace"
+          ]
+        },
+        "400": {
+          "label": "LOD 400 — Fabrication and assembly",
+          "note": "Detailed enough for fabrication and installation, including fixings and discrete components.",
+          "geometry": "mesh",
+          "include": [
+            "*"
+          ],
+          "exclude": [
+            "IfcSpace"
+          ]
+        },
+        "500": {
+          "label": "LOD 500 — Verified as-built",
+          "note": "Field-verified representation. Everything present in the model is shown.",
+          "geometry": "mesh",
+          "include": [
+            "*"
+          ],
+          "exclude": [
+            "IfcSpace"
+          ]
+        }
+      },
+      "sections": {
+        "_comment": "Which field in each framework drives the viewer's level of development. 'column' names the table column holding the LOD value; omit it for a plain field.",
+        "iso19650": {
+          "section": "information_requirements",
+          "field": "loin",
+          "column": "lod"
+        },
+        "nbims_us": {
+          "section": "information_exchanges",
+          "field": "lod_matrix",
+          "column": "lod"
+        },
+        "lite": {
+          "section": "deliverables",
+          "field": "lod_note"
+        }
+      }
+    },
+    "skip_classes": [
+      "IfcOpeningElement",
+      "IfcVirtualElement",
+      "IfcAnnotation",
+      "IfcGrid"
+    ],
+    "_skip_comment": "Classes never written into the viewer payload. Openings are voids, not objects: every viewer hides them."
+  },
+  "ui": {
+    "split_ratio": 0.58,
+    "min_panel_px": 340,
+    "right_panel_tab": "assessment",
+    "show_viewer_tab": true
+  },
+  "scoring": {
+    "ready_score": 65.0,
+    "ready_required_coverage": 90.0,
+    "presence_floor": 0.35
+  },
+  "ids": {
+    "_comment": "Export of the plan's level-of-information-need table as a buildingSMART IDS 1.0 document. 'sources' says which table holds it per framework; 'class_hints' maps words in an element name onto an IFC class when the author has not stated one.",
+    "ifc_version": [
+      "IFC2X3",
+      "IFC4"
+    ],
+    "default_pset": "BEP_Requirements",
+    "author_domain": "example.com",
+    "sources": {
+      "iso19650": {
+        "section": "information_requirements",
+        "field": "loin",
+        "columns": {
+          "element": "element",
+          "ifc_class": "ifc_class",
+          "lod": "lod",
+          "stage": "stage",
+          "geometry": "geometry",
+          "alphanumeric": "alphanumeric"
+        }
+      },
+      "nbims_us": {
+        "section": "information_exchanges",
+        "field": "lod_matrix",
+        "columns": {
+          "element": "element",
+          "ifc_class": "ifc_class",
+          "lod": "lod",
+          "stage": "phase",
+          "alphanumeric": "notes"
+        }
+      }
+    },
+    "class_hints": {
+      "wall": "IfcWall",
+      "partition": "IfcWall",
+      "facade": "IfcCurtainWall",
+      "curtain wall": "IfcCurtainWall",
+      "cladding": "IfcCovering",
+      "slab": "IfcSlab",
+      "deck": "IfcSlab",
+      "floor": "IfcSlab",
+      "roof": "IfcRoof",
+      "ceiling": "IfcCovering",
+      "finish": "IfcCovering",
+      "column": "IfcColumn",
+      "beam": "IfcBeam",
+      "brace": "IfcMember",
+      "truss": "IfcMember",
+      "foundation": "IfcFooting",
+      "footing": "IfcFooting",
+      "pile": "IfcPile",
+      "stair": "IfcStair",
+      "ramp": "IfcRamp",
+      "railing": "IfcRailing",
+      "balustrade": "IfcRailing",
+      "door": "IfcDoor",
+      "window": "IfcWindow",
+      "glazing": "IfcWindow",
+      "lift": "IfcTransportElement",
+      "elevator": "IfcTransportElement",
+      "escalator": "IfcTransportElement",
+      "duct": "IfcDuctSegment",
+      "ductwork": "IfcDuctSegment",
+      "pipe": "IfcPipeSegment",
+      "pipework": "IfcPipeSegment",
+      "valve": "IfcValve",
+      "pump": "IfcPump",
+      "tank": "IfcTank",
+      "cable": "IfcCableCarrierSegment",
+      "containment": "IfcCableCarrierSegment",
+      "switchroom": "IfcElectricDistributionBoard",
+      "intake": "IfcElectricDistributionBoard",
+      "distribution board": "IfcElectricDistributionBoard",
+      "luminaire": "IfcLightFixture",
+      "lighting": "IfcLightFixture",
+      "terminal": "IfcAirTerminal",
+      "diffuser": "IfcAirTerminal",
+      "sanitary": "IfcSanitaryTerminal",
+      "furniture": "IfcFurnishingElement",
+      "road": "IfcCourse",
+      "pavement": "IfcCourse",
+      "highway": "IfcCourse",
+      "space": "IfcSpace",
+      "room": "IfcSpace",
+      "zone": "IfcSpace",
+      "site": "IfcSite",
+      "equipment": "IfcBuildingElementProxy"
+    }
+  }
+}

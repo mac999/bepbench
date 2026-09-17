@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% from "_macros.html" import ring, gate_pill %}
+{% block title %}{{ t('nav.projects') }} — {{ app_name }}{% endblock %}
+
+{% block body %}
+<div class="wrap">
+  <div class="row" style="margin-bottom:18px">
+    <div class="grow">
+      <h1>{{ t('dash.title') }}</h1>
+      <p class="muted" style="margin:2px 0 0">{{ t('app.tagline') }}</p>
+    </div>
+    <button class="btn primary" onclick="document.getElementById('new-project').scrollIntoView({behavior:'smooth'});document.getElementById('np-name').focus()">{{ t('dash.new') }}</button>
+  </div>
+
+  {% if projects %}
+  <div class="hero">
+    <div class="card stat">
+      <div class="num">{{ projects|length }}</div>
+      <div class="cap">{{ t('dash.stat.plans') }}</div>
+    </div>
+    <div class="card stat">
+      <div class="num">{{ portfolio_score|round|int }}<span class="muted" style="font-size:15px">/100</span></div>
+      <div class="cap">{{ t('dash.stat.avg') }}</div>
+    </div>
+    <div class="card stat">
+      <div class="num" style="color: var({{ '--danger' if total_blockers else '--excellent' }})">{{ total_blockers }}</div>
+      <div class="cap">{{ t('dash.stat.blockers') }}</div>
+    </div>
+    <div class="card stat">
+      <div class="num">{{ ready_count }}</div>
+      <div class="cap">{{ t('dash.stat.ready') }}</div>
+    </div>
+  </div>
+
+  <div class="projects">
+    {% for project in projects %}
+      {% set report = reports[project.slug] %}
+      <a class="card proj" href="{{ url_for('web.project_home', slug=project.slug) }}">
+        <div class="row" style="align-items:flex-start">
+          <div class="grow">
+            <div class="name">{{ project.name }}</div>
+            <div class="sub">
+              {{ project.client or t('dash.no_client') }}{% if project.reference %} · {{ project.reference }}{% endif %}
+            </div>
+          </div>
+          {{ ring(report.score, 'sm', project.name) }}
+        </div>
+        <div style="margin-top:14px">
+          <div class="row" style="justify-content:space-between;font-size:11.5px" class="muted">
+            <span class="muted">{{ report.maturity_label }}</span>
+            <span class="muted">{{ report.fields_filled }}/{{ report.fields_total }} {{ t('common.fields') }}</span>
+          </div>
+          <div class="bar" style="margin-top:5px"><i class="tone-{{ report.score|score_tone }}" style="width: {{ report.score }}%"></i></div>
+        </div>
+        <div class="foot">
+          <span class="pill">{{ report.framework_name.split('(')[0] }}</span>
+          {% if project.stage == 'pre_appointment' %}
+            <span class="pill accent">{{ t('stage.pre_appointment') }}</span>
+          {% endif %}
+          {{ gate_pill(report) }}
+          <span class="grow"></span>
+          <span class="muted" style="font-size:11.5px">{{ project.updated_at|relative_time }}</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card empty-state">
+    <div class="big">{{ t('dash.empty.title') }}</div>
+    <p>{{ t('dash.empty.body') }}</p>
+  </div>
+  {% endif %}
+
+  <div class="card" id="new-project" style="margin-top:26px">
+    <div class="card-head"><h2>{{ t('dash.start') }}</h2></div>
+    <form class="card-body stack" method="post" action="{{ url_for('web.create_project') }}">
+      <div class="grid2">
+        <div>
+          <label class="lbl" for="np-name">{{ t('dash.name') }}</label>
+          <input class="input" id="np-name" name="name" required placeholder="Riverside Interchange — Phase 2">
+        </div>
+        <div>
+          <label class="lbl" for="np-client">{{ t('dash.client') }}</label>
+          <input class="input" id="np-client" name="client" placeholder="City Transport Authority">
+        </div>
+        <div>
+          <label class="lbl" for="np-ref">{{ t('dash.reference') }}</label>
+          <input class="input" id="np-ref" name="reference" placeholder="RIV-2026-002">
+        </div>
+        <div>
+          <label class="lbl" for="np-owner">{{ t('dash.owner') }}</label>
+          <input class="input" id="np-owner" name="owner" placeholder="{{ t('dash.owner_hint') }}">
+        </div>
+      </div>
+      <div>
+        <label class="lbl">{{ t('dash.stage') }}</label>
+        <div class="grid2">
+          {% for value, hint in [('delivery', 'stage.delivery_hint'), ('pre_appointment', 'stage.pre_hint')] %}
+            <label class="card pad" style="cursor:pointer;display:block">
+              <div class="row" style="align-items:flex-start">
+                <input type="radio" name="stage" value="{{ value }}"
+                       {% if value == 'delivery' %}checked{% endif %} style="margin-top:3px">
+                <div class="grow">
+                  <div style="font-weight:600">{{ t('stage.' ~ value) }}</div>
+                  <div class="muted" style="font-size:12px;margin-top:3px">{{ t(hint) }}</div>
+                </div>
+              </div>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+      <div>
+        <label class="lbl">{{ t('dash.framework') }}</label>
+        <div class="grid2">
+          {% for framework in frameworks %}
+            <label class="card pad" style="cursor:pointer;display:block">
+              <div class="row" style="align-items:flex-start">
+                <input type="radio" name="framework" value="{{ framework.id }}" required
+                       {% if loop.first %}checked{% endif %} style="margin-top:3px">
+                <div class="grow">
+                  <div style="font-weight:600">{{ framework.name }}</div>
+                  <div class="muted" style="font-size:12px;margin-top:3px">
+                    {{ framework.sections|length }} {{ t('common.sections') }} · {{ framework.total_fields }} {{ t('common.fields') }} · {{ framework.checks|length }} {{ t('common.checks') }}
+                  </div>
+                </div>
+              </div>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn primary" type="submit">{{ t('dash.create') }}</button>
+        <span class="grow"></span>
+      </div>
+    </form>
+  </div>
+
+  <form class="card pad" method="post" action="{{ url_for('web.import_project') }}"
+        enctype="multipart/form-data" style="margin-top:16px">
+    <div class="row rowwrap">
+      <div class="grow">
+        <div style="font-weight:600">{{ t('dash.import.title') }}</div>
+        <div class="muted" style="font-size:12.5px">{{ t('dash.import.body') }}</div>
+      </div>
+      <input class="input" type="file" name="file" accept=".json,application/json" style="max-width:300px">
+      <button class="btn" type="submit">{{ t('dash.import.button') }}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

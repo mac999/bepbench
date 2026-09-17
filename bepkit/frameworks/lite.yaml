@@ -1,0 +1,185 @@
+id: lite
+name: BEP Lite (Small Project / Fast Track)
+version: "1.0"
+reference: "Condensed from ISO 19650-2 for projects under a small-works appointment"
+description: >
+  A one-sitting BEP for small or fast-track appointments. Keeps only the commitments that
+  change behaviour on site: who does what, what gets exchanged, where it lives and how it
+  is checked. Upgrade to the full ISO 19650 framework when the appointment grows.
+
+maturity_bands:
+  - { min: 0,  label: "Initial",   note: "Not yet usable." }
+  - { min: 40, label: "Workable",  note: "Enough to start a small job." }
+  - { min: 70, label: "Agreed",    note: "Signed-off scope for a small appointment." }
+  - { min: 88, label: "Complete",  note: "Nothing material left open." }
+
+sections:
+  - id: basics
+    title: Project Basics
+    icon: "01"
+    weight: 1.0
+    fields:
+      - id: project_name
+        label: Project Name
+        type: text
+        required: true
+      - id: client
+        label: Client
+        type: text
+        required: true
+      - id: lead
+        label: Lead Party
+        type: text
+        required: true
+      - id: scope
+        label: Scope of This Appointment
+        type: markdown
+        required: true
+        quality: { min_words: 40 }
+
+  - id: goals
+    title: What BIM Is For
+    icon: "02"
+    weight: 1.3
+    fields:
+      - id: objectives
+        label: Objectives
+        type: markdown
+        required: true
+        quality: { min_words: 40 }
+      - id: uses
+        label: BIM Uses
+        type: table
+        required: true
+        weight: 1.4
+        quality: { min_rows: 3 }
+        columns:
+          - { id: use, label: Use, type: text, required: true }
+          - { id: owner, label: Owner, type: text, required: true }
+          - { id: output, label: Output, type: text, required: true }
+
+  - id: people
+    title: People
+    icon: "03"
+    weight: 1.2
+    fields:
+      - id: team
+        label: Who Does What
+        type: table
+        required: true
+        weight: 1.4
+        quality: { min_rows: 3 }
+        columns:
+          - { id: role, label: Role, type: text, required: true }
+          - { id: name, label: Name, type: text, required: true }
+          - { id: organisation, label: Organisation, type: text, required: true }
+          - { id: contact, label: Contact, type: text }
+
+  - id: deliverables
+    title: Deliverables
+    icon: "04"
+    weight: 1.3
+    fields:
+      - id: deliverables_table
+        label: Deliverables and Dates
+        type: table
+        required: true
+        weight: 1.5
+        quality: { min_rows: 3 }
+        columns:
+          - { id: deliverable, label: Deliverable, type: text, required: true }
+          - { id: format, label: Format, type: text, required: true, width: "130px" }
+          - { id: author, label: Author, type: text, required: true }
+          - { id: date, label: Due, type: date, required: true, width: "130px" }
+      - id: lod_note
+        label: Level of Detail Expected
+        type: markdown
+        required: true
+        quality: { min_words: 30 }
+
+  - id: working
+    title: How We Work
+    icon: "05"
+    weight: 1.1
+    fields:
+      - id: cde
+        label: Where Files Live
+        type: text
+        required: true
+      - id: naming
+        label: File Naming Rule
+        type: markdown
+        required: true
+        quality: { min_words: 25 }
+      - id: software
+        label: Software and Versions
+        type: table
+        required: true
+        quality: { min_rows: 2 }
+        columns:
+          - { id: software, label: Software, type: text, required: true }
+          - { id: version, label: Version, type: text, required: true, width: "120px" }
+          - { id: used_by, label: Used By, type: text, required: true }
+      - id: coordination
+        label: Coordination and Checking
+        type: markdown
+        required: true
+        quality: { min_words: 40 }
+      - id: meetings
+        label: Meeting Rhythm
+        type: text
+        required: true
+
+  - id: closeout
+    title: Close-Out
+    icon: "06"
+    weight: 0.8
+    fields:
+      - id: handover
+        label: What the Client Gets at the End
+        type: markdown
+        required: true
+        quality: { min_words: 30 }
+      - id: risks
+        label: Top Risks
+        type: table
+        quality: { min_rows: 2 }
+        columns:
+          - { id: risk, label: Risk, type: text, required: true }
+          - { id: mitigation, label: Mitigation, type: text, required: true }
+          - { id: owner, label: Owner, type: text, required: true }
+      - id: signoff
+        label: Agreed By
+        type: table
+        required: true
+        quality: { min_rows: 2 }
+        columns:
+          - { id: name, label: Name, type: text, required: true }
+          - { id: organisation, label: Organisation, type: text, required: true }
+          - { id: date, label: Date, type: date, width: "130px" }
+
+checks:
+  - id: uses_owned
+    rule: table_column_filled
+    section: goals
+    field: uses
+    column: owner
+    severity: blocker
+    message: "Every BIM use needs an owner."
+  - id: deliverables_dated
+    rule: table_column_filled
+    section: deliverables
+    field: deliverables_table
+    column: date
+    severity: blocker
+    message: "Deliverables need due dates."
+  - id: deliverable_authors_known
+    rule: values_subset_of
+    section: deliverables
+    field: deliverables_table
+    column: author
+    against_section: people
+    against_field: team
+    against_column: name
+    severity: minor
+    message: "A deliverable is assigned to someone who is not in the team table."

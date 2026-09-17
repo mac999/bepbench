@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bepbench"
+version = "0.1.0"
+description = "Author, score and export BIM Execution Plans — ISO 19650-2 / NBIMS-US v4, with the IFC model beside the plan"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+keywords = ["bim", "ifc", "iso-19650", "bep", "ids", "buildingsmart", "aec", "construction"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: Flask",
+    "Intended Audience :: Other Audience",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+]
+
+dependencies = [
+    "Flask>=3.0",
+    "Flask-SQLAlchemy>=3.1",
+    "SQLAlchemy>=2.0",
+    "click>=8.1",
+    "PyYAML>=6.0",
+    "gunicorn>=21.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/mac999/bepbench"
+Repository = "https://github.com/mac999/bepbench"
+Issues = "https://github.com/mac999/bepbench/issues"
+
+[project.optional-dependencies]
+ifc = ["ifcopenshell>=0.8.0"]
+ids = ["ifctester>=0.8.0"]
+docx = ["python-docx>=1.1"]
+all = ["ifcopenshell>=0.8.0", "ifctester>=0.8.0", "python-docx>=1.1"]
+dev = ["pytest>=7.4", "esprima>=4.0", "ifcopenshell>=0.8.0", "ifctester>=0.8.0",
+       "python-docx>=1.1"]
+
+[project.scripts]
+bep = "bepkit.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["bepkit*"]
+
+[tool.setuptools.package-data]
+bepkit = [
+    "config_files/*.json",
+    "frameworks/*.yaml",
+    "frameworks/locales/*.yaml",
+    "web/templates/*.html",
+    "web/static/css/*.css",
+    "web/static/js/*.js",
+    "web/static/vendor/*.js",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]

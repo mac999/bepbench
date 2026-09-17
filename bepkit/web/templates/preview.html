@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ t('preview.title') }} — {{ project.name }}{% endblock %}
+{% block menubar %}{% include "_menubar.html" %}{% endblock %}
+{% block crumbs %}{% include "_project_tabs.html" %}{% endblock %}
+
+{% block body %}
+<div class="wrap wide">
+  <div class="row rowwrap" style="margin-bottom:14px">
+    <div class="grow">
+      <h1>{{ t('preview.title') }}</h1>
+      <p class="muted" style="margin:2px 0 0">{{ framework.name }} · {{ report.score|round|int }}/100 · {{ report.maturity_label }}</p>
+    </div>
+    <label class="row" style="gap:6px;font-size:12.5px">
+      <input type="checkbox" id="with-score" checked>
+      <span>{{ t('preview.with_score') }}</span>
+    </label>
+    <a class="btn" id="dl-md" href="{{ url_for('web.export', slug=project.slug, format='md') }}">{{ t('preview.download') }} .md</a>
+    <a class="btn" id="dl-html" href="{{ url_for('web.export', slug=project.slug, format='html') }}">.html</a>
+    <a class="btn" href="{{ url_for('web.export', slug=project.slug, format='json') }}">.json</a>
+    <button class="btn primary" id="print-doc">{{ t('preview.print') }}</button>
+  </div>
+
+  <iframe class="doc-frame" id="doc" title="{{ t('preview.title') }}"
+          src="{{ url_for('web.document', slug=project.slug) }}"></iframe>
+</div>
+
+<script>
+  (function () {
+    var toggle = document.getElementById("with-score");
+    var frame = document.getElementById("doc");
+    var base = "{{ url_for('web.document', slug=project.slug) }}";
+    var exportBase = "{{ url_for('web.export', slug=project.slug) }}";
+    function sync() {
+      var flag = toggle.checked ? "1" : "0";
+      frame.src = base + "?score=" + flag;
+      document.getElementById("dl-md").href = exportBase + "?format=md&score=" + flag;
+      document.getElementById("dl-html").href = exportBase + "?format=html&score=" + flag;
+    }
+    toggle.addEventListener("change", sync);
+    document.getElementById("print-doc").addEventListener("click", function () {
+      frame.contentWindow.focus();
+      frame.contentWindow.print();
+    });
+  })();
+</script>
+{% endblock %}

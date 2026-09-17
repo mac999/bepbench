@@ -1,0 +1,416 @@
+id: nbims_us
+name: NBIMS-US v4 Project BIM Execution Plan
+version: "1.0"
+reference: "NBIMS-US v4 Project BIM Execution Planning Standard; Penn State BIM PxP Guide v2.2"
+description: >
+  US practice BEP following the NBIMS-US v4 clause structure and the Penn State
+  four-step planning procedure: identify BIM uses, map the process, define information
+  exchanges, then build the supporting infrastructure.
+
+maturity_bands:
+  - { min: 0,  label: "Initial",   note: "Placeholder document." }
+  - { min: 25, label: "Drafted",   note: "Uses identified, little process detail." }
+  - { min: 45, label: "Defined",   note: "Uses, exchanges and roles agreed." }
+  - { min: 65, label: "Managed",   note: "Process mapped and quality-controlled." }
+  - { min: 85, label: "Optimised", note: "Fully evidenced and contract ready." }
+
+sections:
+  - id: bep_metadata
+    title: BEP Metadata and Clarifications
+    icon: "01"
+    weight: 0.6
+    reference: "NBIMS-US v4 §5.1"
+    intent: Version, approval status and the clarifications that bound this document.
+    fields:
+      - id: document_version
+        label: Document Version
+        type: text
+        required: true
+      - id: approval_status
+        label: Approval Status
+        type: select
+        required: true
+        options: ["Draft", "For review", "Approved", "Superseded"]
+      - id: clarifications
+        label: Clarifications and Exclusions
+        type: markdown
+        required: true
+        quality: { min_words: 40 }
+      - id: revision_history
+        label: Revision History
+        type: table
+        required: true
+        quality: { min_rows: 1 }
+        columns:
+          - { id: revision, label: Rev, type: text, required: true, width: "70px" }
+          - { id: date, label: Date, type: date, required: true, width: "130px" }
+          - { id: author, label: Author, type: text, required: true }
+          - { id: summary, label: Change, type: text, required: true }
+
+  - id: project_reference
+    title: Project Reference Information
+    icon: "02"
+    weight: 0.8
+    reference: "NBIMS-US v4 §5.2"
+    fields:
+      - id: project_name
+        label: Project Name
+        type: text
+        required: true
+        weight: 1.2
+      - id: project_number
+        label: Project Number
+        type: text
+        required: true
+      - id: owner
+        label: Owner
+        type: text
+        required: true
+      - id: facility_type
+        label: Facility Type
+        type: text
+        required: true
+      - id: location
+        label: Project Location
+        type: text
+        required: true
+      - id: project_metrics
+        label: Project Metrics
+        type: table
+        quality: { min_rows: 3 }
+        columns:
+          - { id: metric, label: Metric, type: text, required: true }
+          - { id: value, label: Value, type: text, required: true }
+      - id: description
+        label: Project Description
+        type: markdown
+        required: true
+        quality: { min_words: 50 }
+
+  - id: contacts
+    title: BIM Contacts
+    icon: "03"
+    weight: 0.9
+    reference: "NBIMS-US v4 §5.3"
+    fields:
+      - id: contacts_table
+        label: Contact Directory
+        type: table
+        required: true
+        weight: 1.5
+        quality: { min_rows: 5 }
+        columns:
+          - { id: organisation, label: Organization, type: text, required: true }
+          - { id: role, label: Project Role, type: text, required: true }
+          - { id: name, label: Contact Name, type: text, required: true }
+          - { id: email, label: Email, type: text, required: true }
+          - { id: phone, label: Phone, type: text }
+
+  - id: roles_responsibilities
+    title: BIM Roles and Responsibilities
+    icon: "04"
+    weight: 1.2
+    reference: "NBIMS-US v4 §5.4"
+    fields:
+      - id: roles_table
+        label: Roles and Staffing
+        type: table
+        required: true
+        weight: 1.4
+        quality: { min_rows: 4 }
+        columns:
+          - { id: role, label: Role, type: text, required: true }
+          - { id: organisation, label: Organization, type: text, required: true }
+          - { id: name, label: Assigned To, type: text, required: true }
+          - { id: responsibility, label: Responsibility, type: text, required: true }
+          - { id: effort, label: Est. Effort, type: text }
+      - id: contractual
+        label: Contractual Requirements
+        type: markdown
+        required: true
+        quality: { min_words: 50 }
+        help: Reference to AIA E203/G201/G202 or equivalent exhibits and model ownership terms.
+      - id: model_ownership
+        label: Model Ownership and Reliance
+        type: markdown
+        required: true
+        quality: { min_words: 40 }
+
+  - id: bim_uses
+    title: BIM Uses
+    icon: "05"
+    weight: 1.4
+    reference: "NBIMS-US v4 §5.5; Penn State PxP Step 1"
+    intent: Select and justify the BIM uses, with value, capability and resource assessment.
+    fields:
+      - id: uses_table
+        label: BIM Use Selection
+        type: table
+        required: true
+        weight: 1.6
+        quality: { min_rows: 6 }
+        columns:
+          - { id: use, label: BIM Use, type: text, required: true }
+          - { id: value, label: Value to Project, type: select, options: ["High", "Medium", "Low"], required: true, width: "120px" }
+          - { id: capability, label: Team Capability, type: select, options: ["High", "Medium", "Low"], required: true, width: "130px" }
+          - { id: decision, label: "Proceed?", type: select, options: ["Yes", "No", "Conditional"], required: true, width: "110px" }
+          - { id: responsible, label: Responsible Party, type: text, required: true }
+          - { id: resources, label: Additional Resources Needed, type: text }
+      - id: use_rationale
+        label: Selection Rationale
+        type: markdown
+        required: true
+        quality: { min_words: 60 }
+
+  - id: process
+    title: BIM Use Process Maps
+    icon: "06"
+    weight: 1.1
+    reference: "NBIMS-US v4 §5.6; Penn State PxP Step 2"
+    intent: Show the overview map and the detailed map for each core BIM use.
+    fields:
+      - id: overview_map
+        label: Level 1 Overview Map Description
+        type: markdown
+        required: true
+        weight: 1.2
+        quality: { min_words: 60 }
+      - id: detail_maps
+        label: Level 2 Detailed Maps
+        type: table
+        required: true
+        weight: 1.2
+        quality: { min_rows: 3 }
+        columns:
+          - { id: use, label: BIM Use, type: text, required: true }
+          - { id: map_ref, label: Map Reference / Link, type: text, required: true }
+          - { id: owner, label: Process Owner, type: text, required: true }
+          - { id: status, label: Status, type: select, options: ["Drafted", "Reviewed", "Agreed"], width: "120px" }
+
+  - id: information_exchanges
+    title: Information Exchanges
+    icon: "07"
+    weight: 1.4
+    reference: "NBIMS-US v4 §5.7; Penn State PxP Step 3"
+    intent: "Define each exchange: sender, receiver, content, LOD, format and timing."
+    fields:
+      - id: exchange_table
+        label: Information Exchange Register
+        type: table
+        required: true
+        weight: 1.6
+        quality: { min_rows: 4 }
+        columns:
+          - { id: exchange, label: Exchange, type: text, required: true }
+          - { id: sender, label: Sender, type: text, required: true }
+          - { id: receiver, label: Receiver, type: text, required: true }
+          - { id: milestone, label: Timing / Milestone, type: text, required: true }
+          - { id: format, label: File Format, type: text, required: true, width: "130px" }
+          - { id: lod, label: LOD / LOI, type: text, required: true, width: "110px" }
+      - id: lod_matrix
+        label: Model Element Breakdown and LOD
+        type: table
+        required: true
+        weight: 1.4
+        quality: { min_rows: 5 }
+        reference: "BIMForum LOD Specification"
+        columns:
+          - { id: element, label: Model Element, type: text, required: true }
+          - { id: phase, label: Phase, type: text, required: true, width: "130px" }
+          - { id: lod, label: LOD, type: select, options: ["100", "200", "300", "350", "400", "500"], required: true, width: "90px" }
+          - { id: ifc_class, label: IFC Class, type: text, width: "150px", placeholder: "IfcWall", help: "Used to generate a buildingSMART IDS." }
+          - { id: author, label: Element Author, type: text, required: true }
+          - { id: notes, label: Notes, type: text }
+
+  - id: collaboration
+    title: Team Collaboration Procedures
+    icon: "08"
+    weight: 0.9
+    reference: "NBIMS-US v4 §5.8"
+    fields:
+      - id: meetings
+        label: Meeting Procedures
+        type: table
+        required: true
+        quality: { min_rows: 3 }
+        columns:
+          - { id: meeting, label: Meeting, type: text, required: true }
+          - { id: stage, label: Project Stage, type: text }
+          - { id: frequency, label: Frequency, type: text, required: true, width: "130px" }
+          - { id: participants, label: Participants, type: text, required: true }
+          - { id: location, label: Location, type: text }
+      - id: file_sharing
+        label: Electronic Communication and File Sharing
+        type: markdown
+        required: true
+        quality: { min_words: 50 }
+      - id: folder_structure
+        label: Folder Structure and Naming
+        type: markdown
+        required: true
+        quality: { min_words: 40 }
+
+  - id: quality_management
+    title: Quality Management
+    icon: "09"
+    weight: 1.1
+    reference: "NBIMS-US v4 §5.9"
+    fields:
+      - id: qc_checks
+        label: Quality Control Checks
+        type: table
+        required: true
+        weight: 1.4
+        quality: { min_rows: 4 }
+        columns:
+          - { id: check, label: Check, type: text, required: true }
+          - { id: definition, label: Definition, type: text, required: true }
+          - { id: responsible, label: Responsible Party, type: text, required: true }
+          - { id: software, label: Software, type: text }
+          - { id: frequency, label: Frequency, type: text, required: true }
+      - id: accuracy_tolerance
+        label: Model Accuracy and Tolerances
+        type: markdown
+        required: true
+        quality: { min_words: 40 }
+      - id: clash_process
+        label: Clash Detection Process
+        type: markdown
+        required: true
+        quality: { min_words: 50 }
+
+  - id: technology
+    title: Technological Infrastructure Needs
+    icon: "10"
+    weight: 0.9
+    reference: "NBIMS-US v4 §5.10"
+    fields:
+      - id: software_table
+        label: Software
+        type: table
+        required: true
+        weight: 1.3
+        quality: { min_rows: 4 }
+        columns:
+          - { id: use, label: BIM Use, type: text, required: true }
+          - { id: software, label: Software, type: text, required: true }
+          - { id: version, label: Version, type: text, required: true, width: "120px" }
+          - { id: discipline, label: Discipline, type: text, required: true }
+      - id: hardware
+        label: Hardware and Network Requirements
+        type: markdown
+        quality: { min_words: 30 }
+      - id: model_platform
+        label: Model Hosting Platform
+        type: text
+        required: true
+
+  - id: model_standards
+    title: Model Federation and Standards
+    icon: "11"
+    weight: 1.1
+    reference: "NBIMS-US v4 §5.11"
+    fields:
+      - id: coordinate_system
+        label: Coordinate System and Origin
+        type: markdown
+        required: true
+        weight: 1.3
+        quality: { min_words: 40 }
+      - id: model_structure
+        label: Model Structure and File Naming
+        type: table
+        required: true
+        weight: 1.3
+        quality: { min_rows: 4 }
+        columns:
+          - { id: model, label: Model File, type: text, required: true }
+          - { id: discipline, label: Discipline, type: text, required: true }
+          - { id: author, label: Author, type: text, required: true }
+          - { id: scope, label: Scope, type: text, required: true }
+      - id: standards_list
+        label: Standards Applied
+        type: table
+        required: true
+        quality: { min_rows: 3 }
+        columns:
+          - { id: standard, label: Standard, type: text, required: true }
+          - { id: version, label: Version, type: text, required: true, width: "120px" }
+          - { id: scope, label: Scope, type: text, required: true }
+      - id: classification
+        label: Classification System
+        type: text
+        required: true
+
+  - id: risk_register
+    title: Information Management Risk Register
+    icon: "12"
+    weight: 0.8
+    reference: "NBIMS-US v4 §5.12"
+    fields:
+      - id: risks
+        label: Risk Register
+        type: table
+        required: true
+        weight: 1.5
+        quality: { min_rows: 4 }
+        columns:
+          - { id: risk, label: Risk, type: text, required: true }
+          - { id: impact, label: Impact, type: select, options: ["High", "Medium", "Low"], required: true, width: "110px" }
+          - { id: likelihood, label: Likelihood, type: select, options: ["High", "Medium", "Low"], required: true, width: "120px" }
+          - { id: mitigation, label: Mitigation, type: text, required: true }
+          - { id: owner, label: Owner, type: text, required: true }
+
+checks:
+  - id: uses_decided
+    rule: table_column_filled
+    section: bim_uses
+    field: uses_table
+    column: decision
+    severity: blocker
+    message: "Every candidate BIM use needs an explicit proceed / do-not-proceed decision."
+  - id: uses_responsible
+    rule: table_column_filled
+    section: bim_uses
+    field: uses_table
+    column: responsible
+    severity: blocker
+    message: "Each BIM use must name a responsible party."
+  - id: exchanges_timed
+    rule: table_column_filled
+    section: information_exchanges
+    field: exchange_table
+    column: milestone
+    severity: major
+    message: "Information exchanges without timing cannot be scheduled."
+  - id: lod_authored
+    rule: table_column_filled
+    section: information_exchanges
+    field: lod_matrix
+    column: author
+    severity: major
+    message: "Every model element needs a named element author."
+  - id: qc_owned
+    rule: table_column_filled
+    section: quality_management
+    field: qc_checks
+    column: responsible
+    severity: major
+    message: "Quality checks need an accountable party."
+  - id: contacts_present
+    rule: min_rows
+    section: contacts
+    field: contacts_table
+    min: 5
+    severity: minor
+    message: "The contact directory looks incomplete for a multi-party project."
+  - id: exchange_senders_known
+    rule: values_subset_of
+    section: information_exchanges
+    field: exchange_table
+    column: sender
+    against_section: contacts
+    against_field: contacts_table
+    against_column: organisation
+    severity: minor
+    message: "An exchange sender is not listed in the contact directory."

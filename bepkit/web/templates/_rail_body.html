@@ -1,0 +1,67 @@
+{# The live score panel body; rendered inside the right-hand tab and standalone. #}
+{% from "_macros.html" import ring, gate_pill %}
+    <div class="rail-section">
+      <div class="metric">
+        <div data-score-ring style="display:contents">{{ ring(report.score, 'md', t('editor.overall')) }}</div>
+        <div class="meta">
+          <div class="eyebrow">{{ t('editor.overall') }}</div>
+          <div style="font-weight:600" data-maturity>{{ report.maturity_label }}</div>
+          <div class="muted" style="font-size:11.5px;line-height:1.45" data-maturity-note>{{ report.maturity_note }}</div>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="kv"><span>{{ t('score.coverage') }}</span><b data-metric="coverage">{{ report.coverage|round|int }}%</b></div>
+        <div class="kv"><span>{{ t('editor.required_answered') }}</span><b data-metric="required">{{ report.required_coverage|round|int }}%</b></div>
+      </div>
+      <div style="margin-top:10px">{{ gate_pill(report) }}</div>
+    </div>
+
+    {% if section %}
+    <div class="rail-section">
+      <div class="row" style="justify-content:space-between">
+        <span class="eyebrow">{{ t('editor.section_score') }}</span>
+        <b style="font-variant-numeric:tabular-nums" data-section-score>{{ section_score.score|round|int }}</b>
+      </div>
+      <div class="bar" style="margin-top:6px">
+        <i data-section-bar class="tone-{{ section_score.score|score_tone }}" style="width: {{ section_score.score }}%"></i>
+      </div>
+      <div class="muted" style="font-size:11.5px;margin-top:6px">
+        {{ section_score.required_complete }}/{{ section_score.required_total }} {{ t('common.required') }} · {{ section_score.coverage|round|int }}% {{ t('common.coverage') }}
+      </div>
+    </div>
+
+    <div class="rail-section">
+      <div class="eyebrow" style="margin-bottom:6px">{{ t('editor.issues') }}</div>
+      <div data-issues>
+        {% if section_issues %}
+          {% for issue in section_issues %}
+            <div class="issue" data-sev="{{ issue.severity }}">
+              <span class="sev"></span>
+              <div>{{ issue.message }}{% if issue.detail %}<div class="detail">{{ issue.detail }}</div>{% endif %}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="muted" style="margin:0;font-size:12.5px">{{ t('editor.no_issues') }}</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="rail-section">
+      <div class="eyebrow" style="margin-bottom:6px">{{ t('editor.next_best') }}</div>
+      <div data-recommendations>
+        {% if report.recommendations %}
+          {% for rec in report.recommendations[:6] %}
+            <div class="rec">
+              <span class="pts">+{{ '%.1f'|format(rec.points) }}</span>
+              <div>
+                <a href="{{ url_for('web.editor', slug=project.slug, section_id=rec.section_id) }}#field-{{ rec.path.split('.')[1] }}">{{ rec.label }}</a>
+                <div class="muted" style="font-size:11.5px">{{ rec.section_title }}</div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="muted" style="margin:0;font-size:12.5px">{{ t('editor.no_gaps') }}</p>
+        {% endif %}
+      </div>
+    </div>

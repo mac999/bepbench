@@ -1,0 +1,138 @@
+{# One editable field. Every input carries data-path so autosave is generic. #}
+{% macro render(section, field, value, field_score) %}
+{% set path = section.id ~ '.' ~ field.id %}
+<div class="field" id="field-{{ field.id }}">
+  <div class="field-head">
+    <div class="grow">
+      <div class="field-title">
+        <label for="in-{{ field.id }}">{{ field.label }}</label>
+        {% if field.required %}<span class="req">{{ t('common.required') }}</span>{% endif %}
+        {% if field.reference %}<span class="field-ref">{{ field.reference }}</span>{% endif %}
+      </div>
+      {% if field.help %}<p class="field-help">{{ field.help }}</p>{% endif %}
+    </div>
+    <button type="button" class="ai-btn" data-ai-open="{{ path }}"
+            data-field-type="{{ field.type }}" title="{{ t('ai.title') }}">✦ {{ t('ai.button') }}</button>
+    <span class="field-state" data-field-state="{{ field.id }}"
+          data-state="{{ field_score.state if field_score else 'empty' }}">
+      {{ t('editor.state.' ~ (field_score.state if field_score else 'empty')) }}
+    </span>
+  </div>
+
+  {% if field.type == 'table' %}
+    <div class="tbl-wrap">
+      <table class="grid" data-table data-path="{{ path }}"
+             data-columns='{{ field.columns | columns_json }}'>
+        <thead>
+          <tr>
+            {% for column in field.columns %}
+              <th class="{{ 'req-col' if column.required }}"
+                  {% if column.width %}style="width:{{ column.width }}"{% endif %}>{{ column.label }}</th>
+            {% endfor %}
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in (value or []) %}
+            <tr>
+              {% for column in field.columns %}
+                <td data-col-cell="{{ column.id }}">
+                  {% if column.type == 'select' and column.options %}
+                    <select data-col="{{ column.id }}">
+                      <option value="">—</option>
+                      {% for option in column.options %}
+                        <option value="{{ option }}" {{ 'selected' if row.get(column.id) == option }}>{{ option }}</option>
+                      {% endfor %}
+                    </select>
+                  {% else %}
+                    <input data-col="{{ column.id }}" type="{{ 'date' if column.type == 'date' else 'text' }}"
+                           value="{{ row.get(column.id, '') }}" placeholder="{{ column.label }}">
+                  {% endif %}
+                </td>
+              {% endfor %}
+              <td class="rowtools">
+                <button type="button" data-remove-row title="{{ t('editor.remove_row') }}"
+                        aria-label="{{ t('editor.remove_row') }}">&times;</button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="tbl-foot">
+      <button class="btn sm" type="button" data-add-row="{{ path }}">+ {{ t('editor.add_row') }}</button>
+      <span class="muted" style="font-size:11.5px">{{ t('editor.table_hint') }}</span>
+    </div>
+    <noscript>
+      <textarea class="input" name="f_{{ field.id }}" rows="6"
+                placeholder='[{"col": "value"}]'>{{ value | tojson if value else '[]' }}</textarea>
+    </noscript>
+
+  {% elif field.type in ('markdown', 'textarea') %}
+    <textarea class="input" id="in-{{ field.id }}" name="f_{{ field.id }}" data-path="{{ path }}"
+              rows="{{ 8 if field.quality.min_words > 60 else 5 }}"
+              placeholder="{{ field.placeholder }}">{{ value or '' }}</textarea>
+
+  {% elif field.type == 'select' %}
+    <select class="input" id="in-{{ field.id }}" name="f_{{ field.id }}" data-path="{{ path }}">
+      <option value="">—</option>
+      {% for option in field.options %}
+        <option value="{{ option }}" {{ 'selected' if value == option }}>{{ option }}</option>
+      {% endfor %}
+    </select>
+
+  {% elif field.type == 'multiselect' %}
+    <select class="input" id="in-{{ field.id }}" name="f_{{ field.id }}" data-path="{{ path }}"
+            multiple size="{{ [field.options|length, 6]|min }}">
+      {% for option in field.options %}
+        <option value="{{ option }}" {{ 'selected' if value and option in value }}>{{ option }}</option>
+      {% endfor %}
+    </select>
+
+  {% elif field.type == 'boolean' %}
+    <label class="row" style="gap:8px;font-size:13px">
+      <input type="checkbox" id="in-{{ field.id }}" name="f_{{ field.id }}" data-path="{{ path }}"
+             {{ 'checked' if value }}>
+      <span>{{ field.placeholder or field.label }}</span>
+    </label>
+
+  {% elif field.type == 'list' %}
+    <input class="input" id="in-{{ field.id }}" name="f_{{ field.id }}" data-path="{{ path }}"
+           value="{{ (value or []) | join(', ') }}" placeholder="{{ field.placeholder }}">
+
+  {% else %}
+    <input class="input" id="in-{{ field.id }}" name="f_{{ field.id }}" data-path="{{ path }}"
+           type="{{ 'date' if field.type == 'date' else ('number' if field.type == 'number' else 'text') }}"
+           value="{{ value if value is not none else '' }}" placeholder="{{ field.placeholder }}">
+  {% endif %}
+
+  {% if field.example %}
+    <div class="field-example">{{ t('editor.example') }}: {{ field.example }}</div>
+  {% endif %}
+  <div class="field-note" data-field-note="{{ field.id }}">{{ field_score.detail if field_score and field_score.state != 'complete' else '' }}</div>
+
+  <div class="ai-panel" data-ai-panel="{{ path }}" hidden>
+    <div class="ai-head">
+      <span class="eyebrow">✦ {{ t('ai.title') }}</span>
+      <span class="seg" role="group">
+        {% for mode in ['draft', 'improve', 'expand', 'critique'] %}
+          <button type="button" data-ai-mode="{{ mode }}" class="{{ 'on' if mode == 'draft' }}">{{ t('ai.mode.' ~ mode) }}</button>
+        {% endfor %}
+      </span>
+      <span class="grow"></span>
+      <button type="button" class="btn ghost sm" data-ai-close>&times;</button>
+    </div>
+    <div class="ai-body">
+      <input class="input ai-instruction" data-ai-instruction placeholder="{{ t('ai.instruction') }}">
+      <div class="ai-output" data-ai-output></div>
+      <div class="ai-foot">
+        <button type="button" class="btn primary sm" data-ai-run>{{ t('ai.run') }}</button>
+        <button type="button" class="btn sm" data-ai-insert disabled>{{ t('ai.insert') }}</button>
+        <button type="button" class="btn sm" data-ai-append disabled>{{ t('ai.append') }}</button>
+        <span class="grow"></span>
+        <span class="ai-status" data-ai-status>{{ t('ai.review_note') }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}

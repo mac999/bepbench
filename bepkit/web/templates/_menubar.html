@@ -1,0 +1,123 @@
+{# Application menu bar. Items either link somewhere or raise a data-action,
+   which workspace.js turns into a viewer or plan command. #}
+<nav class="menubar" data-menubar aria-label="{{ app_name }}">
+  <div class="menu-root">
+    <button class="menu-btn" type="button" data-menu="file" aria-haspopup="true" aria-expanded="false">{{ t('menu.file') }}</button>
+    <div class="menu" data-menu-panel="file" hidden>
+      <a class="menu-item" href="{{ url_for('web.dashboard') }}#new-project">{{ t('menu.new') }}</a>
+      <a class="menu-item" href="{{ url_for('web.dashboard') }}">{{ t('menu.all_plans') }}</a>
+      <a class="menu-item" href="{{ url_for('web.dashboard') }}#import">{{ t('menu.import') }}</a>
+      <hr>
+      <a class="menu-item strong" href="{{ url_for('web.export', slug=project.slug, format='docx') }}">
+        {{ t('menu.save_word') }}</a>
+      <div class="menu-sub">
+        <span class="menu-item has-sub">{{ t('menu.export') }} <span class="chev">›</span></span>
+        <div class="menu submenu">
+          <a class="menu-item" href="{{ url_for('web.export', slug=project.slug, format='md') }}">Markdown (.md)</a>
+          <a class="menu-item" href="{{ url_for('web.export', slug=project.slug, format='html') }}">Web page (.html)</a>
+          <a class="menu-item" href="{{ url_for('web.export', slug=project.slug, format='json') }}">Data (.json)</a>
+        </div>
+      </div>
+      <a class="menu-item" href="{{ url_for('web.document', slug=project.slug) }}" target="_blank" rel="noopener">{{ t('menu.print') }}</a>
+      <hr>
+      <button class="menu-item" type="button" data-action="duplicate">{{ t('menu.duplicate') }}</button>
+      <a class="menu-item" href="{{ url_for('web.settings', slug=project.slug) }}">{{ t('menu.settings') }}</a>
+    </div>
+  </div>
+
+  <div class="menu-root">
+    <button class="menu-btn" type="button" data-menu="plan" aria-haspopup="true" aria-expanded="false">{{ t('menu.plan') }}</button>
+    <div class="menu" data-menu-panel="plan" hidden>
+      <div class="menu-sub">
+        <span class="menu-item has-sub">{{ t('menu.sections') }} <span class="chev">›</span></span>
+        <div class="menu submenu scroll">
+          {% for s in framework.sections %}
+            <a class="menu-item" href="{{ url_for('web.editor', slug=project.slug, section_id=s.id) }}">
+              <span class="idx">{{ '%02d'|format(loop.index) }}</span> {{ s.title }}</a>
+          {% endfor %}
+        </div>
+      </div>
+      <hr>
+      <a class="menu-item strong" href="{{ url_for('web.score', slug=project.slug) }}">{{ t('menu.assessment') }}</a>
+      <button class="menu-item" type="button" data-action="snapshot">{{ t('menu.snapshot') }}</button>
+      <a class="menu-item" href="{{ url_for('web.score', slug=project.slug) }}#snapshots">{{ t('menu.history') }}</a>
+      <a class="menu-item" href="{{ url_for('web.diff', slug=project.slug) }}">{{ t('menu.diff') }}</a>
+      <hr>
+      <a class="menu-item" href="{{ url_for('web.framework_detail', framework_id=framework.id) }}">{{ t('menu.frameworks') }}</a>
+    </div>
+  </div>
+
+  <div class="menu-root">
+    <button class="menu-btn" type="button" data-menu="model" aria-haspopup="true" aria-expanded="false">{{ t('menu.model') }}</button>
+    <div class="menu" data-menu-panel="model" hidden>
+      <button class="menu-item" type="button" data-action="upload-ifc">{{ t('menu.upload_ifc') }}</button>
+      <div class="menu-sub">
+        <span class="menu-item has-sub">{{ t('menu.render_mode') }} <span class="chev">›</span></span>
+        <div class="menu submenu" data-menu-modes></div>
+      </div>
+      <div class="menu-sub">
+        <span class="menu-item has-sub">{{ t('menu.lod') }} <span class="chev">›</span></span>
+        <div class="menu submenu" data-menu-lod>
+          <button class="menu-item" type="button" data-action="lod-follow">{{ t('menu.lod_follow') }}</button>
+          <hr>
+        </div>
+      </div>
+      <hr>
+      <button class="menu-item" type="button" data-action="fit">{{ t('menu.fit') }}</button>
+      <button class="menu-item" type="button" data-action="section-plane">{{ t('menu.section_plane') }}</button>
+      <hr>
+      <a class="menu-item strong" href="{{ url_for('api.export_ids', slug=project.slug) }}">{{ t('menu.ids_export') }}</a>
+      <button class="menu-item" type="button" data-action="ids-check">{{ t('menu.ids_check') }}</button>
+      <hr>
+      <button class="menu-item danger" type="button" data-action="remove-model">{{ t('menu.remove_model') }}</button>
+    </div>
+  </div>
+
+  <div class="menu-root">
+    <button class="menu-btn" type="button" data-menu="view" aria-haspopup="true" aria-expanded="false">{{ t('menu.view') }}</button>
+    <div class="menu" data-menu-panel="view" hidden>
+      <button class="menu-item" type="button" data-action="toggle-nav">{{ t('menu.toggle_nav') }}</button>
+      <div class="menu-sub">
+        <span class="menu-item has-sub">{{ t('menu.theme') }} <span class="chev">›</span></span>
+        <div class="menu submenu">
+          <button class="menu-item" type="button" data-action="theme-light">{{ t('menu.theme_light') }}</button>
+          <button class="menu-item" type="button" data-action="theme-dark">{{ t('menu.theme_dark') }}</button>
+          <button class="menu-item" type="button" data-action="theme-system">{{ t('menu.theme_system') }}</button>
+        </div>
+      </div>
+      <div class="menu-sub">
+        <span class="menu-item has-sub">{{ t('menu.language') }} <span class="chev">›</span></span>
+        <div class="menu submenu">
+          {% for code, label in locales.items() %}
+            <a class="menu-item {{ 'strong' if locale() == code }}"
+               href="{{ url_for('web.set_language', code=code, next=request.full_path) }}">{{ label }}</a>
+          {% endfor %}
+        </div>
+      </div>
+      <hr>
+      <button class="menu-item" type="button" data-action="reset-layout">{{ t('menu.reset_layout') }}</button>
+    </div>
+  </div>
+
+  <div class="menu-root">
+    <button class="menu-btn" type="button" data-menu="help" aria-haspopup="true" aria-expanded="false">{{ t('menu.help') }}</button>
+    <div class="menu" data-menu-panel="help" hidden>
+      <button class="menu-item" type="button" data-action="shortcuts">{{ t('menu.shortcuts') }}</button>
+      <a class="menu-item" href="{{ url_for('web.frameworks') }}">{{ t('menu.about') }}</a>
+    </div>
+  </div>
+</nav>
+
+<dialog class="dialog" data-shortcuts-dialog>
+  <h2>{{ t('menu.shortcuts') }}</h2>
+  <dl class="shortcut-list">
+    <dt><kbd>⌘/Ctrl</kbd> + <kbd>S</kbd></dt><dd>{{ t('shortcuts.save') }}</dd>
+    <dt><kbd>⌘/Ctrl</kbd> + <kbd>↵</kbd></dt><dd>{{ t('shortcuts.next') }}</dd>
+    <dt><kbd>Tab</kbd></dt><dd>{{ t('shortcuts.row') }}</dd>
+    <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>{{ t('shortcuts.resize') }}</dd>
+    <dt><kbd>Esc</kbd></dt><dd>{{ t('shortcuts.menu') }}</dd>
+  </dl>
+  <form method="dialog"><button class="btn" value="close">{{ t('menu.close') }}</button></form>
+</dialog>
+
+<form method="post" data-duplicate-form action="{{ url_for('web.duplicate_project', slug=project.slug) }}" hidden></form>

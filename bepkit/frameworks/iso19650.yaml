@@ -1,0 +1,821 @@
+id: iso19650
+name: ISO 19650-2 BIM Execution Plan
+version: "1.2"
+reference: "BS EN ISO 19650-2:2018 — Delivery phase of the assets"
+description: >
+  Full delivery-team BIM Execution Plan aligned to BS EN ISO 19650-2 and the UK BIM
+  Framework guidance. Covers the pre-appointment commitments and the post-appointment
+  detail an appointing party expects before the mobilisation gate.
+
+maturity_bands:
+  - { min: 0,  label: "Initial",   note: "Little more than a project header. Not shareable." }
+  - { min: 25, label: "Drafted",   note: "Structure in place; most substance still missing." }
+  - { min: 45, label: "Defined",   note: "Core commitments written; gaps remain in delivery detail." }
+  - { min: 65, label: "Managed",   note: "Auditable plan. Suitable for pre-appointment submission." }
+  - { min: 85, label: "Optimised", note: "Complete, evidenced and measurable. Mobilisation ready." }
+
+sections:
+  - id: project_information
+    title: Project Information
+    icon: "01"
+    weight: 0.6
+    reference: "ISO 19650-2 §5.1 / §5.2"
+    intent: Identify the project, the parties and the version control of this plan.
+    guidance: >
+      Every downstream deliverable is named after these values, so fix them first.
+      The project reference and the appointing party's name must match the contract.
+    fields:
+      - id: project_name
+        label: Project Name
+        type: text
+        required: true
+        weight: 1.2
+        placeholder: "Riverside Interchange — Phase 2"
+      - id: project_number
+        label: Project Reference / Number
+        type: text
+        required: true
+        help: Used as the first segment of every information container name.
+      - id: appointing_party
+        label: Appointing Party (Client)
+        type: text
+        required: true
+        weight: 1.2
+      - id: lead_appointed_party
+        label: Lead Appointed Party
+        type: text
+        required: true
+        weight: 1.2
+      - id: project_stage
+        label: Current Project Stage
+        type: select
+        required: true
+        options: ["0 Strategic Definition", "1 Preparation and Brief", "2 Concept Design", "3 Spatial Coordination", "4 Technical Design", "5 Manufacturing and Construction", "6 Handover", "7 Use"]
+      - id: bep_status
+        label: BEP Status
+        type: select
+        required: true
+        options: ["Pre-appointment (tender)", "Post-appointment (delivery)", "Revision under review", "Approved"]
+      - id: project_description
+        label: Project Description and Scope
+        type: markdown
+        required: true
+        weight: 1.1
+        quality: { min_words: 60 }
+        help: Asset type, size, location, contract form and the boundary of this appointment.
+      - id: revision_history
+        label: Revision History
+        type: table
+        required: true
+        quality: { min_rows: 1 }
+        columns:
+          - { id: revision, label: Rev, type: text, required: true, width: "70px" }
+          - { id: date, label: Date, type: date, required: true, width: "130px" }
+          - { id: author, label: Author, type: text, required: true }
+          - { id: summary, label: Summary of Change, type: text, required: true }
+          - { id: approved_by, label: Approved By, type: text }
+
+  - id: objectives_uses
+    title: BIM Objectives and Uses
+    icon: "02"
+    weight: 1.3
+    reference: "ISO 19650-2 §5.1.1 / NBIMS-US v4 §5.5"
+    intent: State why information is being modelled and which uses the team commits to.
+    guidance: >
+      An objective without a measure is a slogan. Tie each objective to something you can
+      evidence at a milestone, and make every BIM use owned by a named task team.
+    fields:
+      - id: bim_goals
+        label: Project Information Goals
+        type: markdown
+        required: true
+        weight: 1.3
+        quality: { min_words: 80 }
+        help: What the appointing party is trying to achieve with information on this project.
+        example: "Reduce site-instruction rework by coordinating all services in a federated model before Stage 4 freeze."
+      - id: bim_uses
+        label: Agreed BIM Uses
+        type: table
+        required: true
+        weight: 1.5
+        quality: { min_rows: 5 }
+        help: Select the uses this delivery team will actually perform, not a wish list.
+        columns:
+          - { id: use, label: BIM Use, type: text, required: true }
+          - { id: priority, label: Priority, type: select, options: ["Core", "Secondary", "Optional"], required: true, width: "110px" }
+          - { id: owner, label: Responsible Task Team, type: text, required: true }
+          - { id: stage, label: Stage(s), type: text, width: "110px" }
+          - { id: output, label: Output / Evidence, type: text, required: true }
+      - id: success_measures
+        label: Success Measures and KPIs
+        type: table
+        required: true
+        weight: 1.1
+        quality: { min_rows: 3 }
+        columns:
+          - { id: measure, label: Measure, type: text, required: true }
+          - { id: target, label: Target, type: text, required: true }
+          - { id: method, label: How Measured, type: text, required: true }
+          - { id: frequency, label: Frequency, type: text }
+      - id: value_case
+        label: Value Case and Constraints
+        type: markdown
+        quality: { min_words: 50 }
+        help: What the uses are expected to save or de-risk, and what limits them.
+
+  - id: team_roles
+    title: Delivery Team and Responsibilities
+    icon: "03"
+    weight: 1.2
+    reference: "ISO 19650-2 §5.1.7 / §5.3"
+    intent: Name who does the information management work and who has authority to approve.
+    guidance: >
+      ISO 19650 assigns functions, not job titles. Every function below must resolve to a
+      named individual with a deputy, otherwise the plan fails an audit on day one.
+    fields:
+      - id: org_structure
+        label: Delivery Team Structure
+        type: markdown
+        required: true
+        quality: { min_words: 60 }
+        help: Describe the lead appointed party, task teams and the chain of appointment.
+      - id: key_roles
+        label: Information Management Functions
+        type: table
+        required: true
+        weight: 1.5
+        quality: { min_rows: 4 }
+        columns:
+          - { id: function, label: Function, type: text, required: true }
+          - { id: organisation, label: Organisation, type: text, required: true }
+          - { id: name, label: Named Individual, type: text, required: true }
+          - { id: contact, label: Contact, type: text }
+          - { id: deputy, label: Deputy, type: text }
+      - id: task_teams
+        label: Task Teams and Scope
+        type: table
+        required: true
+        weight: 1.2
+        quality: { min_rows: 3 }
+        columns:
+          - { id: team, label: Task Team, type: text, required: true }
+          - { id: discipline, label: Discipline, type: text, required: true }
+          - { id: scope, label: Information Scope, type: text, required: true }
+          - { id: lead, label: Task Team Manager, type: text, required: true }
+      - id: raci
+        stages: [delivery]
+        label: RACI for Key Information Activities
+        type: table
+        weight: 1.1
+        quality: { min_rows: 5 }
+        columns:
+          - { id: activity, label: Activity, type: text, required: true }
+          - { id: responsible, label: Responsible, type: text, required: true }
+          - { id: accountable, label: Accountable, type: text, required: true }
+          - { id: consulted, label: Consulted, type: text }
+          - { id: informed, label: Informed, type: text }
+      - id: capability_summary
+        label: Delivery Team Capability and Capacity Summary
+        type: markdown
+        quality: { min_words: 50 }
+        reference: "ISO 19650-2 §5.3.2"
+
+  - id: information_requirements
+    title: Information Requirements (EIR Response)
+    icon: "04"
+    weight: 1.2
+    reference: "ISO 19650-2 §5.1.2 / §5.2.1"
+    intent: Show that the exchange information requirements have been read, mapped and answered.
+    guidance: >
+      This is the section the appointing party reads first. Every EIR clause needs an explicit
+      response — complied, partially complied with a qualification, or a stated deviation.
+    fields:
+      - id: reference_documents
+        label: Governing Requirement Documents
+        type: table
+        required: true
+        weight: 1.2
+        quality: { min_rows: 2 }
+        columns:
+          - { id: document, label: Document, type: text, required: true }
+          - { id: reference, label: Reference / Rev, type: text, required: true }
+          - { id: issued_by, label: Issued By, type: text }
+          - { id: date, label: Date, type: date, width: "130px" }
+      - id: eir_response
+        label: EIR Clause-by-Clause Response
+        type: table
+        required: true
+        weight: 1.5
+        quality: { min_rows: 5 }
+        columns:
+          - { id: clause, label: EIR Clause, type: text, required: true, width: "120px" }
+          - { id: requirement, label: Requirement, type: text, required: true }
+          - { id: response, label: Response, type: select, options: ["Complied", "Partially complied", "Deviation proposed", "Not applicable"], required: true, width: "150px" }
+          - { id: how, label: How Satisfied / Justification, type: text, required: true }
+      - id: information_purposes
+        label: Information Purposes and Decision Points
+        type: markdown
+        required: true
+        quality: { min_words: 60 }
+        help: Which client decisions the delivered information supports, and when.
+      - id: loin
+        label: Level of Information Need
+        type: table
+        required: true
+        weight: 1.4
+        quality: { min_rows: 4 }
+        reference: "EN 17412-1"
+        columns:
+          - { id: element, label: Element / System, type: text, required: true }
+          - { id: stage, label: Stage, type: text, required: true, width: "110px" }
+          - { id: lod, label: Indicative LOD, type: select, options: ["100", "200", "300", "350", "400", "500"], width: "120px", help: "Drives the model viewer's detail filter." }
+          - { id: ifc_class, label: IFC Class, type: text, width: "150px", placeholder: "IfcWall", help: "Used to generate a buildingSMART IDS. Left blank, it is inferred from the element name." }
+          - { id: geometry, label: Geometrical Detail, type: text, required: true }
+          - { id: alphanumeric, label: Alphanumeric Information, type: text, required: true }
+          - { id: documentation, label: Documentation, type: text }
+          - { id: owner, label: Author, type: text, required: true }
+
+  - id: delivery_strategy
+    title: Information Delivery Strategy (MIDP / TIDP)
+    icon: "05"
+    weight: 1.2
+    reference: "ISO 19650-2 §5.3.3 / §5.4"
+    intent: Define what is delivered, by whom, at which milestone, in which format.
+    guidance: >
+      The MIDP is the aggregation of every task team's TIDP. If milestone dates here do not
+      reconcile with the programme, the plan is not deliverable — say so rather than hiding it.
+    fields:
+      - id: milestones
+        label: Information Delivery Milestones
+        type: table
+        required: true
+        weight: 1.5
+        quality: { min_rows: 3 }
+        columns:
+          - { id: milestone, label: Milestone, type: text, required: true }
+          - { id: stage, label: Stage, type: text, width: "110px" }
+          - { id: date, label: Date, type: date, required: true, width: "130px" }
+          - { id: purpose, label: Purpose / Decision Supported, type: text, required: true }
+          - { id: acceptance, label: Acceptance Criteria, type: text, required: true }
+      - id: tidp_summary
+        stages: [delivery]
+        label: TIDP Summary by Task Team
+        type: table
+        required: true
+        weight: 1.3
+        quality: { min_rows: 3 }
+        columns:
+          - { id: team, label: Task Team, type: text, required: true }
+          - { id: container, label: Information Container, type: text, required: true }
+          - { id: format, label: Format, type: text, required: true, width: "120px" }
+          - { id: milestone, label: Due Milestone, type: text, required: true }
+          - { id: author, label: Author, type: text, required: true }
+          - { id: reviewer, label: Reviewer, type: text }
+      - id: midp_approach
+        stages: [delivery]
+        label: MIDP Assembly and Maintenance
+        type: markdown
+        required: true
+        quality: { min_words: 60 }
+        help: How TIDPs are aggregated, baselined and re-issued when the programme moves.
+      - id: mobilisation
+        stages: [delivery]
+        label: Mobilisation Plan
+        type: markdown
+        quality: { min_words: 50 }
+        reference: "ISO 19650-2 §5.4.1"
+        help: Testing the information production methods, CDE and resources before production starts.
+
+  - id: cde_workflow
+    title: Common Data Environment and Workflow
+    icon: "06"
+    weight: 1.2
+    reference: "ISO 19650-1 §12 / ISO 19650-2 §5.1.6"
+    intent: Define the single source of truth, its states and the transitions between them.
+    guidance: >
+      Name the platform, the owner of the platform, and the exact gate that moves a container
+      from Work in Progress to Shared to Published. Ambiguity here causes most CDE audit failures.
+    fields:
+      - id: cde_platform
+        label: CDE Platform and Owner
+        type: text
+        required: true
+        weight: 1.2
+        placeholder: "Autodesk Construction Cloud — administered by the lead appointed party"
+      - id: cde_states
+        label: Container States and Transition Gates
+        type: table
+        required: true
+        weight: 1.4
+        quality: { min_rows: 4 }
+        columns:
+          - { id: state, label: State, type: text, required: true, width: "150px" }
+          - { id: purpose, label: Purpose, type: text, required: true }
+          - { id: entry, label: Entry Criteria, type: text, required: true }
+          - { id: approver, label: Authorises Transition, type: text, required: true }
+      - id: naming_convention
+        label: Information Container Naming Convention
+        type: markdown
+        required: true
+        weight: 1.3
+        quality: { min_words: 40 }
+        reference: "ISO 19650-2 §5.1.6, BS EN ISO 19650-2 UK National Annex"
+        example: "PRJ-ORG-VOL-LVL-TYPE-ROLE-NUMBER, e.g. RIV-ABC-ZZ-02-M3-S-0001"
+      - id: status_codes
+        stages: [delivery]
+        label: Status and Revision Codes
+        type: table
+        required: true
+        weight: 1.2
+        quality: { min_rows: 4 }
+        columns:
+          - { id: code, label: Code, type: text, required: true, width: "90px" }
+          - { id: meaning, label: Meaning, type: text, required: true }
+          - { id: suitability, label: Suitable For, type: text, required: true }
+      - id: access_permissions
+        stages: [delivery]
+        label: Access Rights and Permission Model
+        type: markdown
+        required: true
+        quality: { min_words: 40 }
+      - id: archiving
+        stages: [delivery]
+        label: Archiving and Retention
+        type: markdown
+        quality: { min_words: 30 }
+
+  - id: standards_methods
+    title: Information Standards, Methods and Procedures
+    icon: "07"
+    weight: 1.1
+    reference: "ISO 19650-2 §5.1.4 / §5.1.5"
+    intent: List the standards adopted and the production procedures that enforce them.
+    fields:
+      - id: standards_adopted
+        label: Standards Adopted
+        type: table
+        required: true
+        weight: 1.3
+        quality: { min_rows: 3 }
+        columns:
+          - { id: standard, label: Standard, type: text, required: true }
+          - { id: version, label: Version / Year, type: text, required: true, width: "120px" }
+          - { id: application, label: Applied To, type: text, required: true }
+      - id: classification
+        label: Classification System
+        type: text
+        required: true
+        placeholder: "Uniclass 2015 — tables Ss, Pr, EF applied to all model objects"
+      - id: production_methods
+        label: Information Production Methods and Procedures
+        type: markdown
+        required: true
+        weight: 1.2
+        quality: { min_words: 80 }
+        help: Modelling procedures, templates, shared parameters, drawing production and checking.
+      - id: reference_material
+        stages: [delivery]
+        label: Reference Information and Shared Resources
+        type: table
+        quality: { min_rows: 2 }
+        columns:
+          - { id: resource, label: Resource, type: text, required: true }
+          - { id: source, label: Source / Owner, type: text, required: true }
+          - { id: location, label: Location, type: text }
+      - id: deviation_process
+        stages: [delivery]
+        label: Deviation and Waiver Process
+        type: markdown
+        quality: { min_words: 30 }
+
+  - id: modelling_federation
+    title: Model Structure and Federation Strategy
+    icon: "08"
+    weight: 1.2
+    reference: "ISO 19650-2 §5.4.3 / NBIMS-US v4 §5.11"
+    intent: Define how models are split, georeferenced and assembled into a federated whole.
+    fields:
+      - id: model_breakdown
+        label: Model Breakdown Structure
+        type: table
+        required: true
+        weight: 1.4
+        quality: { min_rows: 4 }
+        columns:
+          - { id: model, label: Model, type: text, required: true }
+          - { id: discipline, label: Discipline, type: text, required: true, width: "130px" }
+          - { id: volume, label: Volume / Zone, type: text }
+          - { id: author, label: Author, type: text, required: true }
+          - { id: software, label: Authoring Software, type: text, required: true }
+      - id: coordinate_system
+        label: Coordinate System and Survey Control
+        type: markdown
+        required: true
+        weight: 1.3
+        quality: { min_words: 40 }
+        help: Project base point, survey point, grid, datum, units and the shared origin agreement.
+        example: "OSGB36 / Newlyn datum. Shared origin E 452100.000, N 245600.000, Z +12.500."
+      - id: federation_strategy
+        label: Federation Strategy
+        type: markdown
+        required: true
+        quality: { min_words: 50 }
+      - id: file_naming_models
+        stages: [delivery]
+        label: Model File and Object Naming
+        type: markdown
+        quality: { min_words: 30 }
+      - id: model_limits
+        stages: [delivery]
+        label: Model Size, Splitting and Performance Rules
+        type: markdown
+        quality: { min_words: 30 }
+
+  - id: coordination_quality
+    title: Coordination and Quality Assurance
+    icon: "09"
+    weight: 1.1
+    reference: "ISO 19650-2 §5.6 / §5.7, NBIMS-US v4 §5.9"
+    intent: Define the review, clash and approval cycle that makes information acceptable.
+    guidance: >
+      Three checks are mandated before a container is shared: model integrity, standards
+      compliance and information content. State who performs each and what the evidence is.
+    fields:
+      - id: coordination_cycle
+        label: Coordination Cycle and Cadence
+        type: markdown
+        required: true
+        weight: 1.2
+        quality: { min_words: 50 }
+      - id: clash_matrix
+        label: Clash Detection Matrix and Tolerances
+        type: table
+        required: true
+        weight: 1.3
+        quality: { min_rows: 4 }
+        columns:
+          - { id: test, label: Test, type: text, required: true }
+          - { id: discipline_a, label: Discipline A, type: text, required: true, width: "130px" }
+          - { id: discipline_b, label: Discipline B, type: text, required: true, width: "130px" }
+          - { id: tolerance, label: Tolerance, type: text, required: true, width: "110px" }
+          - { id: priority, label: Priority, type: select, options: ["Critical", "High", "Medium", "Low"], width: "110px" }
+      - id: qa_checks
+        stages: [delivery]
+        label: Quality Assurance Checks Before Sharing
+        type: table
+        required: true
+        weight: 1.4
+        quality: { min_rows: 3 }
+        columns:
+          - { id: check, label: Check, type: text, required: true }
+          - { id: method, label: Method / Tool, type: text, required: true }
+          - { id: responsible, label: Performed By, type: text, required: true }
+          - { id: frequency, label: Frequency, type: text, required: true }
+          - { id: evidence, label: Evidence Recorded, type: text, required: true }
+      - id: issue_management
+        stages: [delivery]
+        label: Issue and Comment Management
+        type: markdown
+        required: true
+        quality: { min_words: 40 }
+        help: BCF workflow, issue owner, resolution service levels and escalation.
+      - id: authorisation
+        label: Review and Authorisation Process
+        type: markdown
+        required: true
+        quality: { min_words: 40 }
+        reference: "ISO 19650-2 §5.7.4"
+
+  - id: technology
+    title: Technology and Exchange Formats
+    icon: "10"
+    weight: 0.9
+    reference: "NBIMS-US v4 §5.10"
+    intent: Pin down software versions and the interoperability path between them.
+    fields:
+      - id: software_stack
+        label: Software and Versions
+        type: table
+        required: true
+        weight: 1.3
+        quality: { min_rows: 4 }
+        columns:
+          - { id: purpose, label: Purpose, type: text, required: true }
+          - { id: software, label: Software, type: text, required: true }
+          - { id: version, label: Version, type: text, required: true, width: "120px" }
+          - { id: used_by, label: Used By, type: text, required: true }
+      - id: exchange_formats
+        label: Exchange Formats
+        type: table
+        required: true
+        weight: 1.3
+        quality: { min_rows: 3 }
+        columns:
+          - { id: exchange, label: Exchange, type: text, required: true }
+          - { id: format, label: Format, type: text, required: true, width: "150px" }
+          - { id: schema, label: Schema / MVD, type: text, width: "160px" }
+          - { id: validation, label: Validation Method, type: text, required: true }
+      - id: interoperability
+        label: Interoperability Risks and Mitigation
+        type: markdown
+        quality: { min_words: 40 }
+      - id: infrastructure
+        stages: [delivery]
+        label: Hardware, Network and Licensing
+        type: markdown
+        quality: { min_words: 30 }
+
+  - id: collaboration
+    title: Collaboration and Communication
+    icon: "11"
+    weight: 0.8
+    reference: "NBIMS-US v4 §5.8"
+    intent: Set the meeting rhythm and the channels that keep the delivery team aligned.
+    fields:
+      - id: meetings
+        label: Meeting Schedule
+        type: table
+        required: true
+        weight: 1.2
+        quality: { min_rows: 3 }
+        columns:
+          - { id: meeting, label: Meeting, type: text, required: true }
+          - { id: frequency, label: Frequency, type: text, required: true, width: "130px" }
+          - { id: chair, label: Chair, type: text, required: true }
+          - { id: attendees, label: Attendees, type: text, required: true }
+          - { id: output, label: Output, type: text }
+      - id: communication_channels
+        label: Communication Channels and Escalation
+        type: markdown
+        required: true
+        quality: { min_words: 40 }
+      - id: decision_log
+        stages: [delivery]
+        label: Decision Recording
+        type: markdown
+        quality: { min_words: 25 }
+
+  - id: security
+    title: Information Security
+    icon: "12"
+    weight: 0.8
+    reference: "ISO 19650-5"
+    intent: Apply a security-minded approach proportionate to the sensitivity of the asset.
+    fields:
+      - id: security_triage
+        label: Security Triage Outcome
+        type: select
+        required: true
+        weight: 1.2
+        options: ["Sensitive — security-minded approach required", "Not sensitive — baseline controls", "Triage not yet performed"]
+      - id: classification_scheme
+        label: Information Classification and Handling
+        type: table
+        required: true
+        quality: { min_rows: 3 }
+        columns:
+          - { id: classification, label: Classification, type: text, required: true }
+          - { id: examples, label: Applies To, type: text, required: true }
+          - { id: handling, label: Handling Rule, type: text, required: true }
+      - id: access_control
+        label: Access Control and Third-Party Sharing
+        type: markdown
+        required: true
+        quality: { min_words: 40 }
+      - id: incident_response
+        stages: [delivery]
+        label: Breach and Incident Response
+        type: markdown
+        quality: { min_words: 30 }
+
+  - id: handover
+    title: Handover and Asset Information
+    icon: "13"
+    weight: 0.9
+    reference: "ISO 19650-3 / AIR"
+    intent: Define the information the operator receives and the form it arrives in.
+    fields:
+      - id: air_response
+        label: Asset Information Requirements Response
+        type: markdown
+        required: true
+        weight: 1.2
+        quality: { min_words: 50 }
+      - id: handover_deliverables
+        label: Handover Deliverables
+        type: table
+        required: true
+        weight: 1.3
+        quality: { min_rows: 3 }
+        columns:
+          - { id: deliverable, label: Deliverable, type: text, required: true }
+          - { id: format, label: Format, type: text, required: true, width: "140px" }
+          - { id: responsible, label: Responsible, type: text, required: true }
+          - { id: milestone, label: Due, type: text, required: true, width: "130px" }
+      - id: cobie_strategy
+        stages: [delivery]
+        label: Structured Data / COBie Strategy
+        type: markdown
+        quality: { min_words: 40 }
+        help: COBie version and sheets, or the alternative structured schema agreed with the operator.
+      - id: as_built_process
+        stages: [delivery]
+        label: As-Built Verification Process
+        type: markdown
+        quality: { min_words: 30 }
+
+  - id: risk
+    title: Information Management Risk Register
+    icon: "14"
+    weight: 0.8
+    reference: "NBIMS-US v4 §5.12"
+    intent: Record the information risks that could stop delivery, with owners and mitigations.
+    fields:
+      - id: risk_register
+        label: Risk Register
+        type: table
+        required: true
+        weight: 1.5
+        quality: { min_rows: 4 }
+        columns:
+          - { id: risk, label: Risk, type: text, required: true }
+          - { id: impact, label: Impact, type: select, options: ["High", "Medium", "Low"], required: true, width: "110px" }
+          - { id: likelihood, label: Likelihood, type: select, options: ["High", "Medium", "Low"], required: true, width: "120px" }
+          - { id: mitigation, label: Mitigation, type: text, required: true }
+          - { id: owner, label: Owner, type: text, required: true }
+          - { id: review_date, label: Review Date, type: date, width: "130px" }
+      - id: risk_process
+        stages: [delivery]
+        label: Risk Review Process
+        type: markdown
+        quality: { min_words: 30 }
+
+  - id: training
+    title: Competence and Training
+    icon: "15"
+    weight: 0.6
+    intent: Close the gap between the capability assessed and the capability required.
+    fields:
+      - id: competence_assessment
+        label: Competence Assessment Summary
+        type: markdown
+        required: true
+        quality: { min_words: 40 }
+      - id: training_plan
+        stages: [delivery]
+        label: Training Plan
+        type: table
+        quality: { min_rows: 2 }
+        columns:
+          - { id: topic, label: Topic, type: text, required: true }
+          - { id: audience, label: Audience, type: text, required: true }
+          - { id: provider, label: Provider, type: text }
+          - { id: date, label: Target Date, type: date, width: "130px" }
+
+  - id: approval
+    title: Appendices and Approval
+    icon: "16"
+    weight: 0.5
+    intent: Close the document out with the attachments and the signatures that make it binding.
+    fields:
+      - id: appendices
+        stages: [delivery]
+        label: Appendices
+        type: table
+        quality: { min_rows: 2 }
+        columns:
+          - { id: ref, label: Ref, type: text, required: true, width: "80px" }
+          - { id: title, label: Title, type: text, required: true }
+          - { id: location, label: Location / Link, type: text }
+      - id: agreement_notes
+        stages: [delivery]
+        label: Agreed Qualifications and Assumptions
+        type: markdown
+        quality: { min_words: 30 }
+      - id: signatories
+        label: Approval Signatories
+        type: table
+        required: true
+        weight: 1.2
+        quality: { min_rows: 2 }
+        columns:
+          - { id: name, label: Name, type: text, required: true }
+          - { id: role, label: Role, type: text, required: true }
+          - { id: organisation, label: Organisation, type: text, required: true }
+          - { id: date, label: Date, type: date, width: "130px" }
+
+checks:
+  - id: uses_have_owners
+    rule: table_column_filled
+    section: objectives_uses
+    field: bim_uses
+    column: owner
+    severity: blocker
+    message: "Every agreed BIM use must name the task team responsible for delivering it."
+    fix: "Open BIM Objectives and Uses and fill the Responsible Task Team column."
+
+  - id: uses_have_evidence
+    rule: table_column_filled
+    section: objectives_uses
+    field: bim_uses
+    column: output
+    severity: major
+    message: "A BIM use with no stated output cannot be verified at a milestone."
+
+  - id: milestones_dated
+    rule: table_column_filled
+    section: delivery_strategy
+    field: milestones
+    column: date
+    severity: blocker
+    message: "Delivery milestones without dates cannot be programmed or audited."
+
+  - id: milestones_acceptance
+    rule: table_column_filled
+    section: delivery_strategy
+    field: milestones
+    column: acceptance
+    severity: major
+    message: "Each milestone needs acceptance criteria, otherwise delivery cannot be accepted or rejected."
+
+  - id: roles_named
+    rule: table_column_filled
+    section: team_roles
+    field: key_roles
+    column: name
+    severity: blocker
+    message: "Information management functions must resolve to named individuals, not organisations."
+
+  - id: risks_owned
+    rule: table_column_filled
+    section: risk
+    field: risk_register
+    column: owner
+    severity: major
+    message: "Unowned risks are not managed risks."
+
+  - id: eir_all_answered
+    rule: table_column_filled
+    section: information_requirements
+    field: eir_response
+    column: how
+    severity: major
+    message: "Each EIR clause response needs a justification or method statement."
+
+  - id: security_triage_done
+    rule: field_not_value
+    section: security
+    field: security_triage
+    value: "Triage not yet performed"
+    severity: major
+    message: "ISO 19650-5 security triage must be completed before the plan is issued."
+
+  - id: loin_covers_milestones
+    rule: min_rows
+    section: information_requirements
+    field: loin
+    min: 4
+    severity: major
+    message: "Level of Information Need is defined for too few elements to drive production."
+
+  - id: tidp_teams_covered
+    rule: values_cover
+    section: delivery_strategy
+    field: tidp_summary
+    column: team
+    against_section: team_roles
+    against_field: task_teams
+    against_column: team
+    severity: major
+    message: "Every task team declared in the delivery team must appear in the TIDP summary."
+    fix: "Add a TIDP row for each task team, or remove the team if it has no deliverables."
+
+  - id: uses_owner_known
+    rule: values_subset_of
+    section: objectives_uses
+    field: bim_uses
+    column: owner
+    against_section: team_roles
+    against_field: task_teams
+    against_column: team
+    severity: minor
+    message: "A BIM use is assigned to a team that is not listed in the delivery team structure."
+
+  - id: software_covers_models
+    rule: values_subset_of
+    section: modelling_federation
+    field: model_breakdown
+    column: software
+    against_section: technology
+    against_field: software_stack
+    against_column: software
+    severity: minor
+    message: "Authoring software used in the model breakdown is not listed in the technology stack."
+
+  - id: approval_signed
+    rule: min_rows
+    section: approval
+    field: signatories
+    min: 2
+    severity: minor
+    message: "A BEP needs signatories from both the appointing and lead appointed party."

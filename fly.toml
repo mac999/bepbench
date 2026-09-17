@@ -1,0 +1,48 @@
+# Fly.io deployment. `app` must be globally unique on Fly; edit it if taken, then:
+#   fly launch --no-deploy --copy-config
+#   fly volumes create bep_data --size 1 --region iad
+#   fly secrets set SECRET_KEY=$(python3 -c "import secrets;print(secrets.token_hex(32))")
+#   fly deploy
+#
+# IFC tessellation is memory-hungry; the volume holds both the SQLite file and
+# the uploaded models, so size it for the models you expect.
+app = "bepbench"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  BEP_DATA_DIR = "/data"
+  PORT = "8080"
+  # Point this at a reachable model endpoint to enable AI drafting in the cloud;
+  # left unset, the assist panel reports that no model is available.
+  # BEP_CONFIG = "/data/config.json"
+
+[[mounts]]
+  source = "bep_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 40
+    hard_limit = 60
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/healthz"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1gb"   # ifcopenshell tessellation is the peak
