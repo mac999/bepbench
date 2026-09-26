@@ -250,6 +250,7 @@ bepkit/
 | [Scoring model](docs/03-scoring.md) | How the number is produced, and what it cannot tell you |
 | [Configuration](docs/04-configuration.md) | The JSON settings, and writing your own framework |
 | [Deployment](docs/05-deployment.md) | Fly.io, Docker, operations |
+| [Roadmap](docs/06-roadmap.md) | Measured scaling limits and what to build next |
 
 ## Tests
 
