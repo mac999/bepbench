@@ -436,8 +436,14 @@ body.app-shell { overflow: hidden; }
 .workspace.triple > .pane-right {
   min-width: 0; height: 100%; overflow-y: auto; overscroll-behavior: contain;
 }
-.workspace.triple > .sidenav { padding-right: 12px; }
-.workspace.triple > .pane-bep { padding-right: 2px; }
+/* Each pane owns a column. Without this, hiding the navigator shifts every
+   later pane one track left, into the 0px and 7px tracks. */
+.workspace.triple > .sidenav { grid-column: 1; padding-right: 12px; }
+.workspace.triple > .pane-bep { grid-column: 2; padding-right: 2px; }
+.workspace.triple > [data-splitter="left"] { grid-column: 3; }
+.workspace.triple > .pane-model { grid-column: 4; }
+.workspace.triple > [data-splitter="right"] { grid-column: 5; }
+.workspace.triple > .pane-right { grid-column: 6; }
 .workspace.triple > .pane-model { min-width: 0; height: 100%; overflow: hidden; }
 /* The properties pane splits its own height: the object tree takes what is
    going, and the selected element's properties scroll under it. */
@@ -479,7 +485,9 @@ body.nav-hidden .workspace.triple > .sidenav { display: none; }
   .workspace.triple > .sidenav,
   .workspace.triple > .pane-bep,
   .workspace.triple > .pane-model,
-  .workspace.triple > .pane-right { height: auto; overflow: visible; }
+  .workspace.triple > .pane-right {
+    height: auto; overflow: visible; grid-column: 1;
+  }
   .workspace.triple > .pane-model,
   .workspace.triple > .pane-right { margin-top: 14px; }
   .viewer-canvas { height: clamp(320px, 60vh, 700px); flex: none; }

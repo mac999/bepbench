@@ -146,3 +146,33 @@ def test_cards_in_a_grid_do_not_carry_the_stacking_margin():
                 holders.add(container)
     for container in holders:
         assert f".{container} > .card" in css, container
+
+
+def test_workspace_panes_are_pinned_to_their_own_grid_columns():
+    """Hiding a grid item shifts every later item one track left.
+
+    The section navigator is hidden both by a breakpoint and by the ☰ toggle.
+    Without explicit placement that pushed the plan pane into the 0px navigator
+    track and the model pane into a 7px splitter track, blanking the editor at
+    every common laptop width (1280, 1366, 1440).
+    """
+    css = (STATIC / "css" / "app.css").read_text(encoding="utf-8")
+
+    expected = {
+        ".sidenav": 1, ".pane-bep": 2, '[data-splitter="left"]': 3,
+        ".pane-model": 4, '[data-splitter="right"]': 5, ".pane-right": 6,
+    }
+    for selector, column in expected.items():
+        # a selector may appear in several rules; the placement need only be in one
+        rule = f".workspace.triple > {selector} {{"
+        bodies, at = [], css.find(rule)
+        assert at != -1, f"{selector} has no rule in the triple workspace"
+        while at != -1:
+            bodies.append(css[at:css.find("}", at)])
+            at = css.find(rule, at + 1)
+        assert any(f"grid-column: {column}" in b for b in bodies), \
+            f"{selector} must sit in column {column}"
+
+    # the stacked layout is a single column, so the placement is released there
+    stacked = css[css.find("@media (max-width: 1100px)"):]
+    assert "grid-column: 1;" in stacked
