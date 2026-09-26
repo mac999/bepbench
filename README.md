@@ -26,7 +26,7 @@ the plan into a hosted LLM.
 | **Puts the model next to the plan** | Upload an IFC and it renders beside the editor, filtered to the LOD the plan itself declares. Select an element and see its properties next to the requirement this plan places on it. |
 | **Drafts with a local model** | Per-field Draft / Improve / Expand / Critique through Ollama. Nothing leaves the machine; nothing is saved without a click. |
 | **Exports to Word** | A real `.docx` with styled headings, native tables and a TOC field — plus Markdown, HTML and JSON. |
-| **Three frameworks, all in YAML** | ISO 19650-2 (16 sections, 69 fields), NBIMS-US v4, and a Lite template. A house standard is a file, not a fork. |
+| **Three frameworks, all in YAML** | ISO 19650-2 (16 sections, 68 fields), NBIMS-US v4, and a Lite template. A house standard is a file, not a fork. |
 | **English and Korean**, light and dark, full CLI for scripting and CI. | |
 
 ### Demo video
@@ -123,7 +123,7 @@ bep new "Riverside Phase 2" -f iso19650 --stage pre_appointment
 bep score <plan> --stage delivery    # what it would score as a delivery BEP
 ```
 
-In the ISO framework 22 of 69 fields are marked delivery-only — TIDPs, mobilisation,
+In the ISO framework 22 of 68 fields are marked delivery-only — TIDPs, mobilisation,
 confirmed CDE rules, training. The same answers score **97.8** as a pre-appointment BEP and
 **66.6** as a delivery BEP, which is the honest reading of both.
 
@@ -251,6 +251,7 @@ bepkit/
 | [Configuration](docs/04-configuration.md) | The JSON settings, and writing your own framework |
 | [Deployment](docs/05-deployment.md) | Fly.io, Docker, operations |
 | [Roadmap](docs/06-roadmap.md) | Measured scaling limits and what to build next |
+| [Progress](docs/progress.md) | What exists, what was measured, what is known to be missing |
 
 ## Tests
 

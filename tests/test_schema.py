@@ -53,3 +53,23 @@ def test_korean_overlay_translates_display_only():
 def test_missing_translation_falls_back_to_english():
     framework = localize(get_framework("nbims_us"), "ko")
     assert framework.sections[0].title == get_framework("nbims_us").sections[0].title
+
+
+def test_documented_framework_sizes_match_the_yaml():
+    """The README quotes concrete counts; they must not drift from the files."""
+    import re
+    from pathlib import Path
+
+    readme = (Path(__file__).resolve().parent.parent / "README.md").read_text(encoding="utf-8")
+    framework = get_framework("iso19650")
+
+    quoted = re.search(r"ISO 19650-2 \((\d+) sections, (\d+) fields\)", readme)
+    assert quoted, "README no longer states the ISO framework size"
+    assert int(quoted.group(1)) == len(framework.sections)
+    assert int(quoted.group(2)) == framework.total_fields
+
+    delivery_only = framework.total_fields - framework.fields_in_stage("pre_appointment")
+    stated = re.search(r"(\d+) of (\d+) fields are marked delivery-only", readme)
+    assert stated, "README no longer states the delivery-only count"
+    assert int(stated.group(1)) == delivery_only
+    assert int(stated.group(2)) == framework.total_fields
