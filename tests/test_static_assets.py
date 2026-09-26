@@ -121,3 +121,28 @@ def test_the_page_container_class_is_never_used_as_a_flex_modifier():
     css = (STATIC / "css" / "app.css").read_text(encoding="utf-8")
     assert ".row.rowwrap { flex-wrap: wrap;" in css
     assert ".row.wrap {" not in css
+
+
+def test_cards_in_a_grid_do_not_carry_the_stacking_margin():
+    """`.card + .card` spaces cards that stack in document flow.
+
+    Inside a grid the container's own `gap` does that job, and the extra margin
+    made the first card in each row 16px taller than its neighbours, because it
+    alone has no preceding sibling to take the margin.
+    """
+    import re
+
+    css = (STATIC / "css" / "app.css").read_text(encoding="utf-8")
+    assert ".card + .card { margin-top: 16px; }" in css
+    reset = re.search(r"^[^\n{]*> \.card[^{]*\{ margin-top: 0; \}", css, re.M)
+    assert reset, "grid children must have the stacking margin reset"
+
+    # every grid container that holds a card must be covered by that reset
+    holders = set()
+    for template in TEMPLATES.glob("*.html"):
+        markup = template.read_text(encoding="utf-8")
+        for container in ("hero", "projects", "grid2"):
+            if f'class="{container}"' in markup:
+                holders.add(container)
+    for container in holders:
+        assert f".{container} > .card" in css, container

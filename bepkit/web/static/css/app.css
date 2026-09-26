@@ -148,6 +148,11 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
 }
 .card.pad { padding: 20px; }
 .card + .card { margin-top: 16px; }
+/* Grid and flex containers already space their children with `gap`. Leaving the
+   stacking margin on would add to it and, because the first child has no such
+   margin, stretch that one card taller than the rest of the row. */
+.hero > .card, .projects > .card, .grid2 > .card,
+[class*="grid"] > .card, .row > .card { margin-top: 0; }
 .card-head {
   display: flex; align-items: center; gap: 10px;
   padding: 14px 18px; border-bottom: 1px solid var(--line-2);
