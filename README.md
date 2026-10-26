@@ -11,7 +11,8 @@ side by side with the IFC model it governs.
 
 **[Demo app → bepbench.fly.dev](https://bepbench.fly.dev/)** — the sample plan and the Duplex
 model, already loaded. It sleeps when idle and wakes on the first visit in a few seconds.
-It is open to anyone, so use it with sample data only.
+It is open to anyone, so use it with sample data only. It runs on a CPU-only machine with
+no language model, so AI drafting is off there; scoring, IDS and the IFC viewer all work.
 
 Everything runs on your own machine. The default model provider is a local Ollama, because
 an ISO 19650-5 triage routinely classifies an asset as sensitive — which rules out pasting
