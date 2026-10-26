@@ -9,9 +9,9 @@ side by side with the IFC model it governs.
 
 ![Workspace](docs/demo/img/workspace.png)
 
-**[Live demo](https://9jsmyi0kzvzw7p-8888.proxy.runpod.net/)** — the sample plan and model,
-already loaded. It is paused now and then to save cost; if it does not answer,
-[ask](https://github.com/mac999/bepbench/issues) and I will start it.
+**[Demo app → bepbench.fly.dev](https://bepbench.fly.dev/)** — the sample plan and the Duplex
+model, already loaded. It sleeps when idle and wakes on the first visit in a few seconds.
+It is open to anyone, so use it with sample data only.
 
 Everything runs on your own machine. The default model provider is a local Ollama, because
 an ISO 19650-5 triage routinely classifies an asset as sensitive — which rules out pasting
