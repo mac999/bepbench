@@ -1,5 +1,10 @@
 # Revision history
 
+## 2026-10-27 — Demo app on Fly.io
+
+- The README links a public demo app at https://bepbench.fly.dev/, with the sample plan and
+  model loaded; AI drafting is off there, as the server runs no language model.
+
 ## 2026-10-26 — Requirements tab
 
 - New *Requirements* tab in the editor: pick a milestone, download its IDS, see what was

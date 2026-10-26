@@ -284,7 +284,7 @@ bepkit/
 
 ```bash
 pip install -e ".[dev]"
-pytest -q        # 124 tests
+pytest -q        # 169 tests
 ```
 
 Optional-dependency tests skip when the dependency is absent. No test needs a model server
@@ -294,6 +294,19 @@ or a network.
 
 BS EN ISO 19650-1/-2/-5 · NBIMS-US v4 · Penn State BIM PxP Guide v2.2 · EN 17412-1 ·
 BIMForum LOD Specification · buildingSMART IDS 1.0 · IFC2X3 / IFC4
+
+## Version history
+
+| Date | Change |
+| --- | --- |
+| 2026-10-27 | Public demo app on Fly.io |
+| 2026-10-26 | *Requirements* tab: one milestone, its IDS, every model checked; N/A instead of a false pass |
+| 2026-10-25 | IDS by milestone, each model checked in its own schema, data responsibility matrix |
+| 2026-10-14 | RunPod deployment and live demo |
+| 2026-09-26 | Layout fixes, roadmap and progress record |
+| 2026-09-18 | First release |
+
+Details in [CHANGELOG.md](CHANGELOG.md).
 
 ## Acknowledge
 
