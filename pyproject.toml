@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bepbench"
-version = "0.1.0"
+version = "0.4.1"
 description = "Author, score and export BIM Execution Plans — ISO 19650-2 / NBIMS-US v4, with the IFC model beside the plan"
 readme = "README.md"
 requires-python = ">=3.11"

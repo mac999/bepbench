@@ -297,14 +297,15 @@ BIMForum LOD Specification · buildingSMART IDS 1.0 · IFC2X3 / IFC4
 
 ## Version history
 
-| Date | Change |
-| --- | --- |
-| 2026-10-27 | Public demo app on Fly.io |
-| 2026-10-26 | *Requirements* tab: one milestone, its IDS, every model checked; N/A instead of a false pass |
-| 2026-10-25 | IDS by milestone, each model checked in its own schema, data responsibility matrix |
-| 2026-10-14 | RunPod deployment and live demo |
-| 2026-09-26 | Layout fixes, roadmap and progress record |
-| 2026-09-18 | First release |
+| Version | Date | Change |
+| --- | --- | --- |
+| 0.4.1 | 2026-10-27 | Public demo app on Fly.io |
+| 0.4.0 | 2026-10-26 | *Requirements* tab: one milestone, its IDS, every model checked; N/A instead of a false pass |
+| 0.3.0 | 2026-10-25 | IDS by milestone, each model checked in its own schema, data responsibility matrix |
+| 0.2.1 | 2026-10-22 | Credit for the Duplex Apartment model |
+| 0.2.0 | 2026-10-14 | RunPod deployment and live demo |
+| 0.1.1 | 2026-09-26 | Layout fixes, roadmap and progress record |
+| 0.1.0 | 2026-09-18 | First release |
 
 Details in [CHANGELOG.md](CHANGELOG.md).
 
