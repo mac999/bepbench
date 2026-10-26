@@ -38,7 +38,25 @@
        "ids_checking": t("ids.checking"),
        "ids_result": t("ids.result"),
        "ids_none": t("ids.none"),
-       "ids_no_milestones": t("ids.no_milestones")
+       "ids_no_milestones": t("ids.no_milestones"),
+       "req_all": t("req.all"),
+       "req_summary": t("req.summary"),
+       "req_skipped": t("req.skipped"),
+       "req_narrowed": t("req.narrowed"),
+       "req_inferred": t("req.inferred"),
+       "req_default_pset": t("req.default_pset"),
+       "req_default_pset_note": t("req.default_pset_note"),
+       "req_models": t("req.models"),
+       "req_run": t("req.run"),
+       "req_not_run": t("req.not_run"),
+       "req_rerun": t("req.rerun"),
+       "req_pass": t("req.pass"),
+       "req_fail": t("req.fail"),
+       "req_na": t("req.na"),
+       "req_na_note": t("req.na_note"),
+       "req_out_of_schema": t("req.out_of_schema"),
+       "req_row": t("req.row"),
+       "req_no_specs": t("req.no_specs")
      } | tojson }}'>
 
   {% include "_project_nav.html" %}
@@ -101,12 +119,16 @@
       <div class="tabs">
         <button class="tab on" type="button" data-tab="properties">{{ t('tab.properties') }}</button>
         <button class="tab" type="button" data-tab="assessment">{{ t('tab.assessment') }}</button>
+        <button class="tab" type="button" data-tab="requirements">{{ t('tab.requirements') }}</button>
       </div>
       <div class="tab-panel" data-tab-panel="properties">
         {% include "_properties_panel.html" %}
       </div>
       <div class="tab-panel" data-tab-panel="assessment" hidden>
         {% include "_rail_body.html" %}
+      </div>
+      <div class="tab-panel" data-tab-panel="requirements" hidden>
+        {% include "_requirements_panel.html" %}
       </div>
     </div>
   </aside>

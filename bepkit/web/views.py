@@ -117,8 +117,16 @@ def editor(slug: str, section_id: str):
     lod_field = (f"{lod_spec['section']}.{lod_spec['field']}"
                  if lod_spec.get("section") == section.id and lod_spec.get("field") else "")
 
+    # Where the level of information need table lives, so a requirement in the
+    # Requirements tab links back to the rows it came from.
+    ids_source = setting(f"ids.sources.{project.framework_id}", {}) or {}
+    loin_url = (url_for("web.editor", slug=project.slug, section_id=ids_source["section"])
+                + f"#field-{ids_source['field']}"
+                if ids_source.get("section") and ids_source.get("field") else "")
+
     return render_template(
         "editor.html",
+        loin_url=loin_url,
         project=project,
         framework=framework,
         section=section,

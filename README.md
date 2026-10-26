@@ -103,7 +103,7 @@ The LOIN table states what each element must carry. IDS is the standard that mak
 statement machine-checkable, so the two are the same information in two forms. Exporting
 rather than re-authoring keeps them from drifting apart.
 
-![IDS export and check](docs/demo/img/ids.png)
+<img src="docs/demo/img/ids.png" alt="The Requirements tab: one milestone, its IDS, and every attached model checked" width="380">
 
 ```bash
 bep ids export <plan> -o plan.ids          # IDS 1.0, XSD-valid, every milestone
@@ -113,7 +113,12 @@ bep ids check  <plan> --milestone 3 --fail-on-error --json   # a CI gate
 ```
 
 A plan's LOIN table spans several milestones, so a Stage 3 model is checked against Stage 3
-rows only. A plan has a model per discipline, so the check covers each one.
+rows only. A plan has a model per discipline, so the check covers each one. In the web app
+the *Requirements* tab beside *Properties* and *Assessment* does the same: pick a milestone,
+download its IDS, and check every attached model, each reported on its own.
+
+A specification with nothing in the model to apply to passes in IDS terms but has checked
+nothing, so it is reported as **N/A** and not counted as satisfied.
 
 A row that names no IFC class, or a class the target schema lacks, is **reported, never
 guessed** into a silent false positive; inference from the element name is a convenience and

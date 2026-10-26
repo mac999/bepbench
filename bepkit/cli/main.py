@@ -807,14 +807,18 @@ def ids_check(ctx: Context, slug: str, model: str | None, model_id: tuple[int, .
                 continue
             _echo_build_notes(entry.get("build", {}), indent="    ")
             for spec in entry["results"]:
-                mark = (click.style("PASS", fg="green") if spec["passed"]
-                        else click.style("FAIL", fg="red"))
+                mark = {"passed": click.style("PASS", fg="green"),
+                        "failed": click.style("FAIL", fg="red"),
+                        "not_applicable": click.style("N/A ", dim=True)}[spec["status"]]
                 click.echo(f"    {mark}  {spec['identifier']}  {spec['name'][:40].ljust(40)}"
                            + click.style(f"{spec['applicable']} applicable, "
                                          f"{spec['failures']} failing", dim=True))
         click.echo()
-        click.echo(f"  {report['passed']}/{report['specifications']} specifications satisfied"
-                   f" across {len(report['models'])} model(s)")
+        checked = report["specifications"] - report["not_applicable"]
+        click.echo(f"  {report['passed']}/{checked} specifications satisfied"
+                   f" across {len(report['models'])} model(s)"
+                   + (f", {report['not_applicable']} with nothing to apply to"
+                      if report["not_applicable"] else ""))
     if fail_on_error and report["failed"]:
         sys.exit(4)
 

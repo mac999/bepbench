@@ -198,6 +198,18 @@ def test_a_standard_property_set_is_what_a_real_model_carries(plan):
     assert unqualified["failed"] == 1
 
 
+def test_a_specification_with_nothing_to_check_is_not_counted_as_passed(plan):
+    """Duplex has no lifts: the spec passes in IDS terms but has checked nothing."""
+    from bepkit import services
+
+    services.set_values(plan, {"information_requirements.loin": [
+        DOOR, dict(DOOR, element="Lift cores", ifc_class="IfcTransportElement")]})
+    report = services.check_ids(plan, model_path=str(DUPLEX))
+    statuses = {r["name"]: r["status"] for r in report["results"]}
+    assert statuses == {"Doors": "passed", "Lift cores": "not_applicable"}
+    assert (report["passed"], report["failed"], report["not_applicable"]) == (1, 0, 1)
+
+
 def test_an_explicit_schema_beats_the_model_and_says_so(plan):
     from bepkit import services
 
@@ -250,7 +262,8 @@ def cli(monkeypatch):
 
 def test_cli_lists_milestones(cli):
     result = cli("ids", "milestones", "duplex", "--json")
-    assert json.loads(result.output) == {"column": "stage", "milestones": ["3", "4"]}
+    assert json.loads(result.output) == {"column": "stage", "milestones": ["3", "4"],
+                                          "default": ""}
 
 
 def test_cli_splits_one_document_per_milestone(cli, tmp_path):
@@ -309,6 +322,12 @@ def test_api_lists_milestones_and_exports_one(client, plan):
     report = client.get(f"/api/projects/{plan.slug}/ids?report=1&ifc_version=IFC4X3_ADD2"
                         "&default_pset=Site_Data").get_json()
     assert report["ifc_version"] == ["IFC4X3_ADD2"] and report["specifications"] == 2
+
+
+def test_the_editor_offers_a_requirements_tab_linked_to_the_loin_table(client, plan):
+    page = client.get(f"/p/{plan.slug}/s/project_information").get_data(as_text=True)
+    assert 'data-tab="requirements"' in page
+    assert f'data-loin-url="/p/{plan.slug}/s/information_requirements#field-loin"' in page
 
 
 def test_api_check_covers_every_attached_model(client, plan):

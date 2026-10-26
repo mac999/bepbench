@@ -1,5 +1,14 @@
 # Revision history
 
+## 2026-10-26 — Requirements tab
+
+- New *Requirements* tab in the editor: pick a milestone, download its IDS, see what was
+  skipped or inferred, and check every attached model, each with its own result.
+- *Model → Check* opens the tab; the model list shows each model's last result.
+- A specification with nothing to apply to is reported as N/A, not as passed.
+- One segmented-control style across the viewer, object tree, AI panel and the new tab.
+- Fly.io deployment moves to Tokyo (`nrt`); ifcopenshell and ifctester are pinned below 0.10.
+
 ## 2026-10-25 — IDS by milestone, every model checked
 
 - IDS export cuts by milestone (`--milestone`) or writes one file per milestone (`--split`);

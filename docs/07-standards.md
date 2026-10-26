@@ -46,13 +46,14 @@ plans. Holding many appointments in one plan would change the data model for lit
 
 **One plan produces one IDS per milestone.** The LOIN table names a milestone on every row,
 and a Stage 3 model must not be checked against Stage 4 requirements. `bep ids export
---milestone 3` cuts one; `--split` writes one file per milestone; the web app offers each
-milestone under *Model → Export IDS for one milestone*. The default, with no milestone, is
-every row in one document.
+--milestone 3` cuts one; `--split` writes one file per milestone. In the web app the
+*Requirements* tab picks the milestone once, and both the download and the model check use
+it. The default, with no milestone, is every row in one document.
 
 **One plan is checked against every model attached to it.** A plan has a model per
 discipline. `bep ids check` runs against each, in each model's own schema, and reports them
-separately; `--model-id` narrows it.
+separately; `--model-id` narrows it. A specification that applies to nothing in a model is
+reported as not applicable rather than passed.
 
 **A class the target schema lacks is reported, never exported.** `IfcCourse` exists only in
 IFC4X3. Aimed at an IFC4 model, a specification for it would match nothing and pass. The

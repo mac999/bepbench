@@ -33,11 +33,13 @@ _FILE_SCHEMA = re.compile(r"FILE_SCHEMA\s*\(\s*\(\s*'([^']+)'", re.IGNORECASE)
 
 
 def ids_milestones(project: Project) -> dict[str, Any]:
-    """The milestones the plan's LOIN table names, and the column that holds them."""
+    """The milestones the plan's LOIN table names, the column that holds them,
+    and the one an export or check uses when none is asked for."""
     framework = framework_for(project)
     return {
         "column": milestone_column(framework.id),
         "milestones": milestones(framework.id, project.values()),
+        "default": str(setting("ids.milestone", "") or ""),
     }
 
 
@@ -147,13 +149,13 @@ def check_ids(project: Project, *, model_ids: Iterable[int] | None = None,
         except IdsError as exc:
             errors.append(f"{target['filename']}: {exc}")
             entry.update({"error": str(exc), "specifications": 0, "passed": 0,
-                          "failed": 0, "results": []})
+                          "failed": 0, "not_applicable": 0, "results": []})
             reports.append(entry)
             continue
         except Exception as exc:  # an unreadable IFC is the author's to fix, not a crash
             errors.append(f"{target['filename']}: {exc}")
             entry.update({"error": f"could not read the model: {exc}", "specifications": 0,
-                          "passed": 0, "failed": 0, "results": []})
+                          "passed": 0, "failed": 0, "not_applicable": 0, "results": []})
             reports.append(entry)
             continue
         entry.update(report)
@@ -171,6 +173,7 @@ def check_ids(project: Project, *, model_ids: Iterable[int] | None = None,
         "specifications": sum(r["specifications"] for r in checked),
         "passed": sum(r["passed"] for r in checked),
         "failed": sum(r["failed"] for r in checked) + (len(reports) - len(checked)),
+        "not_applicable": sum(r["not_applicable"] for r in checked),
         "results": [dict(item, model=r["model"]) for r in checked for item in r["results"]],
         "model": reports[0]["model"],
     }

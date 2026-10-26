@@ -297,6 +297,16 @@ td.rowtools { width: 34px; text-align: center; }
 .tone-weak      { --ring-color: var(--weak); }
 .tone-empty     { --ring-color: var(--empty); }
 
+/* ---------- segmented control: one style wherever it appears ---------- */
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button {
+  border: 0; background: var(--surface); color: var(--ink-3); cursor: pointer;
+  font: 600 11px/1 var(--sans); padding: 5px 8px;
+}
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button.on { background: var(--accent-soft); color: var(--accent); }
+.seg button:hover:not(.on) { background: var(--surface-3); }
+
 /* ---------- bars, pills, badges ---------- */
 .bar { height: 5px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
 .bar > i { display: block; height: 100%; border-radius: 99px; background: var(--accent); transition: width .35s ease; }
@@ -542,14 +552,8 @@ body.resizing iframe, body.resizing canvas { pointer-events: none; }
   display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
   padding: 9px 12px; border-bottom: 1px solid var(--line-2);
 }
-.viewer-bar .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
-.viewer-bar .seg button {
-  border: 0; background: var(--surface); color: var(--ink-3); cursor: pointer;
-  font: 600 11.5px/1 var(--sans); padding: 6px 9px;
-}
-.viewer-bar .seg button + button { border-left: 1px solid var(--line); }
-.viewer-bar .seg button.on { background: var(--accent-soft); color: var(--accent); }
-.viewer-bar .seg button:hover { background: var(--surface-3); }
+.viewer-bar .seg { border-radius: 7px; }
+.viewer-bar .seg button { font-size: 11.5px; padding: 6px 9px; }
 .viewer-canvas {
   /* Takes whatever height the model pane has left after its toolbars. */
   position: relative; width: 100%; flex: 1 1 auto; min-height: 220px;
@@ -612,13 +616,6 @@ body.resizing iframe, body.resizing canvas { pointer-events: none; }
 }
 .ai-panel[hidden] { display: none !important; }
 .ai-head { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-bottom: 1px solid var(--line-2); flex-wrap: wrap; }
-.ai-head .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
-.ai-head .seg button {
-  border: 0; background: var(--surface); color: var(--ink-3); cursor: pointer;
-  font: 600 11px/1 var(--sans); padding: 5px 8px;
-}
-.ai-head .seg button + button { border-left: 1px solid var(--line); }
-.ai-head .seg button.on { background: var(--accent-soft); color: var(--accent); }
 .ai-body { padding: 10px; }
 .ai-output {
   white-space: pre-wrap; font-size: 12.5px; line-height: 1.6; max-height: 320px; overflow-y: auto;
@@ -687,13 +684,6 @@ a.menu-item:hover, button.menu-item:hover, .menu-item.has-sub:hover { background
 
 /* ---------- object tree ---------- */
 .tree-head { display: flex; align-items: center; gap: 6px; padding: 10px 12px 8px; }
-.tree-head .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
-.tree-head .seg button {
-  border: 0; background: var(--surface); color: var(--ink-3); cursor: pointer;
-  font: 600 11px/1 var(--sans); padding: 5px 8px;
-}
-.tree-head .seg button + button { border-left: 1px solid var(--line); }
-.tree-head .seg button.on { background: var(--accent-soft); color: var(--accent); }
 .tree-filter { width: 100%; padding: 5px 9px; font-size: 12px; }
 .tree {
   max-height: clamp(180px, 34vh, 420px); overflow: auto; padding: 0 6px 10px;
@@ -730,3 +720,26 @@ a.menu-item:hover, button.menu-item:hover, .menu-item.has-sub:hover { background
   border-color: color-mix(in srgb, var(--danger) 45%, transparent); color: var(--ink-2); }
 .diff-text .new { background: color-mix(in srgb, var(--excellent) 8%, transparent);
   border-color: color-mix(in srgb, var(--excellent) 45%, transparent); }
+
+/* ---------- requirements tab ---------- */
+.req-head { display: flex; align-items: center; gap: 8px; }
+.req-note { font-size: 12px; margin-top: 6px; }
+.req-note.muted { font-size: 11px; }
+.req-empty { font-size: 12px; margin: 8px 0 0; }
+.req-model { border: 1px solid var(--line); border-radius: var(--radius-sm); margin-top: 8px; overflow: hidden; }
+.req-model > summary {
+  list-style: none; display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; cursor: pointer; background: var(--surface-2);
+}
+.req-model > summary::-webkit-details-marker { display: none; }
+.req-model .nm { font-weight: 600; font-size: 12.5px; overflow-wrap: anywhere; }
+.req-spec {
+  display: grid; grid-template-columns: 62px minmax(0, 1fr) auto; gap: 2px 8px; align-items: center;
+  padding: 6px 10px; border-top: 1px solid var(--line-2); font-size: 12px;
+}
+.req-spec .id { font-family: var(--mono); font-size: 11px; }
+.req-spec .why { grid-column: 2 / 4; font-size: 11px; color: var(--ink-3); overflow-wrap: anywhere; }
+.req-spec .why.warn, .req-spec .why.bad { grid-column: 1 / 4; }
+.req-spec .why.warn { color: var(--fair); }
+.req-spec .why.bad { color: var(--danger); }
+.model-row .req-badge { font-size: 10.5px; padding: 0 6px; margin-top: 3px; }

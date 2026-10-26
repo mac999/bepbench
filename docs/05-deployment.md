@@ -15,9 +15,16 @@ derived viewer payloads under `models/`.
 
 ```bash
 fly launch --no-deploy --copy-config          # the app name must be free on Fly
-fly volumes create bep_data --size 3 --region iad
+fly volumes create bep_data --size 1 --region nrt   # same region as primary_region
 fly secrets set SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
 fly deploy
+```
+
+The app is served openly unless a login is set; do that whenever the plans on it are not
+demo data:
+
+```bash
+fly secrets set BEP_AUTH_USER=bep BEP_AUTH_PASSWORD=<password>
 ```
 
 `fly.toml` mounts the volume at `/data`, health-checks `/healthz`, and suspends the machine

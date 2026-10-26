@@ -251,6 +251,7 @@
       ].join("");
     }).join("");
 
+    markModelRows();
     host.querySelectorAll("[data-model-row]").forEach(function (row) {
       row.addEventListener("click", function (event) {
         if (event.target.closest("[data-model-delete]")) return;
@@ -588,25 +589,9 @@
         refreshModels();
       });
     } else if (action === "ids-check") {
-      var toast = window.bepToast || function (m) { console.log(m); };
-      toast(s("ids_checking", "Checking the model against the plan…"));
-      // Every attached model is checked, each in its own schema: a plan has a
-      // model per discipline, not one model.
-      fetch(api("/ids/check"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({})
-      })
-        .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, body: b }; }); })
-        .then(function (result) {
-          if (!result.ok) { toast(result.body.error || s("ids_none", "Nothing to check.")); return; }
-          var b = result.body;
-          toast((s("ids_result", "{passed} of {total} specifications satisfied across {models} model(s)")
-            .replace("{passed}", b.passed).replace("{total}", b.specifications)
-            .replace("{models}", (b.models || []).length)));
-          console.table(b.results);
-        })
-        .catch(function () { toast(s("ids_none", "Nothing to check.")); });
+      if (!req) return;
+      openRequirements();
+      reqLoadMilestones().then(reqLoadDocument).then(runIdsCheck);
     } else if (action === "toggle-nav") {
       var button = document.querySelector("[data-toggle-nav]");
       if (button) button.click();
@@ -634,6 +619,195 @@
       });
     }
   });
+
+  /* ---------------- requirements tab ----------------
+     The plan relates to IDS documents and to models one-to-many: the milestone
+     picked here drives the download and the check alike, and every attached
+     model is reported on its own, in its own schema. Opening the tab reads the
+     cheap export report; the check reads every model, so it waits for a click. */
+  var req = document.querySelector("[data-req]");
+  var reqMilestone = null;          // null until the plan's default is known
+  var reqChecks = {};               // model id → last check entry, for the model list
+
+  function fmt(template, values) {
+    return String(template).replace(/\{(\w+)\}/g, function (m, key) {
+      return values[key] == null ? m : values[key];
+    });
+  }
+  function reqQuery() { return "milestone=" + encodeURIComponent(reqMilestone || ""); }
+  function scopeLabel() { return reqMilestone ? "· " + reqMilestone : "· " + s("req_all", "All"); }
+  function issueRow(sev, title, detail) {
+    return '<div class="issue" data-sev="' + sev + '"><span class="sev"></span><div>' + esc(title) +
+      '<div class="detail">' + esc(detail) + "</div></div></div>";
+  }
+  function rowLabel(row) { return fmt(s("req_row", "Row {row}"), { row: row }); }
+
+  function reqLoadMilestones() {
+    return fetch(api("/ids/milestones")).then(function (r) { return r.ok ? r.json() : { milestones: [] }; })
+      .then(function (info) {
+        var list = info.milestones || [];
+        if (reqMilestone === null) {
+          reqMilestone = list.indexOf(info["default"] || "") >= 0 ? info["default"] : "";
+        } else if (reqMilestone && list.indexOf(reqMilestone) < 0) {
+          reqMilestone = "";        // the milestone left the table since the last visit
+        }
+        var host = req.querySelector("[data-req-milestones]");
+        host.innerHTML = [""].concat(list).map(function (m) {
+          return '<button type="button" data-req-milestone="' + esc(m) + '" class="' +
+            (m === reqMilestone ? "on" : "") + '">' + esc(m || s("req_all", "All")) + "</button>";
+        }).join("");
+      });
+  }
+
+  function reqLoadDocument() {
+    req.querySelector("[data-req-scope]").textContent = scopeLabel();
+    req.querySelector("[data-req-download]").setAttribute("href", api("/ids?" + reqQuery()));
+    var summary = req.querySelector("[data-req-summary]");
+    var notes = req.querySelector("[data-req-notes]");
+    return fetch(api("/ids?report=1&" + reqQuery()))
+      .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, body: b }; }); })
+      .then(function (result) {
+        if (!result.ok) { summary.textContent = result.body.error || ""; notes.innerHTML = ""; return; }
+        var b = result.body, html = [];
+        summary.textContent = fmt(s("req_summary", "{count} specifications · for {versions}"),
+          { count: b.specifications, versions: (b.ifc_version || []).join(", ") });
+        (b.skipped || []).forEach(function (i) {
+          html.push(issueRow("major", rowLabel(i.row) + " " + i.element, i.reason + " — " + s("req_skipped", "not exported")));
+        });
+        (b.narrowed || []).forEach(function (i) {
+          html.push(issueRow("minor", rowLabel(i.row) + " " + i.element, i.reason + " — " + s("req_narrowed", "limited to those schemas")));
+        });
+        // Inferred classes are expected, not faults: one line, the rows listed in its detail.
+        if ((b.inferred || []).length) {
+          html.push(issueRow("minor", fmt(s("req_inferred", "{count} classes inferred from element names"),
+            { count: b.inferred.length }),
+            b.inferred.map(function (i) { return i.element + ": " + i.reason; }).join(" · ")));
+        }
+        if (b.default_pset_properties) {
+          html.push(issueRow("minor",
+            fmt(s("req_default_pset", "{count} properties name no property set"), { count: b.default_pset_properties }),
+            fmt(s("req_default_pset_note", "Required in {pset}"), { pset: b.default_pset })));
+        }
+        notes.innerHTML = html.join("");
+      })
+      .catch(function () { summary.textContent = ""; notes.innerHTML = ""; });
+  }
+
+  function specStatus(r) {
+    if (r.status === "not_applicable") return '<span class="pill">' + esc(s("req_na", "N/A")) + "</span>";
+    if (r.status === "passed") return '<span class="pill ok">' + esc(s("req_pass", "Pass")) + "</span>";
+    return '<span class="pill bad">' + esc(fmt(s("req_fail", "{failures}/{applicable} fail"), r)) + "</span>";
+  }
+  function tally(entry) {
+    var checked = (entry.results || []).filter(function (r) { return r.status !== "not_applicable"; });
+    var passed = checked.filter(function (r) { return r.status === "passed"; }).length;
+    return { passed: passed, total: checked.length, tone: entry.error || passed < checked.length ? "bad" : "ok" };
+  }
+
+  function renderModelCheck(entry, open) {
+    var loin = req.getAttribute("data-loin-url");
+    var t = tally(entry);
+    var rows = (entry.results || []).map(function (r) {
+      var id = loin ? '<a class="id" href="' + esc(loin) + '">' + esc(r.identifier) + "</a>"
+                    : '<span class="id">' + esc(r.identifier) + "</span>";
+      return '<div class="req-spec">' + id + "<span>" + esc(r.name) + "</span>" + specStatus(r) +
+        (r.status === "not_applicable" ? '<span class="why">' + esc(s("req_na_note", "")) + "</span>" : "") + "</div>";
+    });
+    var build = entry.build || {};
+    (build.skipped || []).concat(build.narrowed || []).forEach(function (i) {
+      rows.push('<div class="req-spec"><span class="id muted">' + esc(rowLabel(i.row)) + "</span><span>" +
+        esc(i.element) + '</span><span class="pill">' + esc(s("req_out_of_schema", "Not in schema")) +
+        '</span><span class="why">' + esc(i.reason) + "</span></div>");
+    });
+    if (entry.warning) rows.unshift('<div class="req-spec"><span class="why warn">' + esc(entry.warning) + "</span></div>");
+    if (entry.error) rows.unshift('<div class="req-spec"><span class="why bad">' + esc(entry.error) + "</span></div>");
+    if (!rows.length) rows.push('<div class="req-spec"><span class="why">' + esc(s("req_no_specs", "")) + "</span></div>");
+    return '<details class="req-model"' + (open ? " open" : "") + "><summary>" +
+      '<span class="grow"><span class="nm">' + esc(entry.model) + "</span> " +
+      (entry.schema ? '<span class="pill">' + esc(entry.schema) + "</span>" : "") + "</span>" +
+      '<span class="pill ' + t.tone + '">' + t.passed + "/" + t.total + "</span></summary>" +
+      rows.join("") + "</details>";
+  }
+
+  function runIdsCheck() {
+    var toast = window.bepToast || function (m) { console.log(m); };
+    var host = req.querySelector("[data-req-models]");
+    var button = req.querySelector("[data-req-run]");
+    button.disabled = true;
+    host.innerHTML = '<p class="muted req-empty"><span class="spin"></span> ' +
+      esc(s("ids_checking", "Checking…")) + "</p>";
+    return fetch(api("/ids/check"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ milestone: reqMilestone || "" })
+    })
+      .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, body: b }; }); })
+      .then(function (result) {
+        button.disabled = false;
+        if (!result.ok) {
+          var message = result.body.error || s("ids_none", "Nothing to check.");
+          host.innerHTML = '<p class="muted req-empty">' + esc(message) + "</p>";
+          toast(message);
+          return;
+        }
+        var b = result.body, models = b.models || [];
+        reqChecks = {};
+        models.forEach(function (m) { if (m.model_id != null) reqChecks[m.model_id] = m; });
+        host.innerHTML = models.map(function (m, i) { return renderModelCheck(m, i === 0 || m.error); }).join("");
+        req.querySelector("[data-req-model-count]").textContent = fmt(s("req_models", "· {count}"), { count: models.length });
+        button.textContent = s("req_rerun", "Check again");
+        markModelRows();
+        toast(fmt(s("ids_result", "{passed} of {total} specifications satisfied across {models} model(s)"),
+          { passed: b.passed, total: b.specifications - (b.not_applicable || 0), models: models.length }));
+      })
+      .catch(function () {
+        button.disabled = false;
+        host.innerHTML = '<p class="muted req-empty">' + esc(s("ids_none", "Nothing to check.")) + "</p>";
+      });
+  }
+
+  // The last result follows each model into the viewer's model list.
+  function markModelRows() {
+    document.querySelectorAll("[data-model-row]").forEach(function (row) {
+      var old = row.querySelector("[data-req-badge]");
+      if (old) old.remove();
+      var entry = reqChecks[row.getAttribute("data-model-row")];
+      if (!entry) return;
+      var t = tally(entry);
+      row.querySelector(".grow").insertAdjacentHTML("beforeend",
+        '<span class="pill ' + t.tone + ' req-badge" data-req-badge>IDS' +
+        (reqMilestone ? " " + esc(reqMilestone) : "") + " " + t.passed + "/" + t.total + "</span>");
+    });
+  }
+
+  function openRequirements() {
+    var tab = document.querySelector('[data-tab="requirements"]');
+    if (tab && !tab.classList.contains("on")) tab.click();
+  }
+
+  if (req) {
+    req.addEventListener("click", function (event) {
+      var pick = event.target.closest("[data-req-milestone]");
+      if (pick) {
+        reqMilestone = pick.getAttribute("data-req-milestone");
+        req.querySelectorAll("[data-req-milestone]").forEach(function (b) { b.classList.toggle("on", b === pick); });
+        // A result for another milestone would mislead, so it is cleared.
+        reqChecks = {};
+        markModelRows();
+        req.querySelector("[data-req-models]").innerHTML =
+          '<p class="muted req-empty">' + esc(s("req_not_run", "Not checked yet.")) + "</p>";
+        req.querySelector("[data-req-model-count]").textContent = "";
+        req.querySelector("[data-req-run]").textContent = s("req_run", "Check models");
+        reqLoadDocument();
+      } else if (event.target.closest("[data-req-run]")) {
+        runIdsCheck();
+      }
+    });
+    var reqTab = document.querySelector('[data-tab="requirements"]');
+    if (reqTab) reqTab.addEventListener("click", function () {
+      reqLoadMilestones().then(reqLoadDocument);
+    });
+  }
 
   /* IDS export per milestone: the plan's LOIN table spans several, and a
      model is delivered against one. The list comes from the table itself. */

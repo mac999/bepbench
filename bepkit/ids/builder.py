@@ -60,6 +60,7 @@ class BuildResult:
     ifc_version: list[str] = field(default_factory=list)
     milestone: str = ""
     default_pset_properties: int = 0
+    default_pset: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -68,6 +69,7 @@ class BuildResult:
             "milestone": self.milestone,
             "identifiers": list(self.identifiers),
             "default_pset_properties": self.default_pset_properties,
+            "default_pset": self.default_pset,
             "skipped": [s.to_dict() for s in self.skipped],
             "inferred": [i.to_dict() for i in self.inferred],
             "narrowed": [n.to_dict() for n in self.narrowed],
@@ -257,7 +259,8 @@ def build(
     )
 
     classification = _classification_system(source, values)
-    result = BuildResult(xml="", specifications=0, ifc_version=versions, milestone=milestone)
+    result = BuildResult(xml="", specifications=0, ifc_version=versions, milestone=milestone,
+                         default_pset=pset)
 
     for index, row in enumerate(rows, start=1):
         element = str(row.get(columns.get("element", "element"), "")).strip()
@@ -379,27 +382,25 @@ def validate_against(xml: str, ifc_path: str,
         document.validate(model)
 
         specifications = []
-        passed = failed = 0
+        counts = {"passed": 0, "failed": 0, "not_applicable": 0}
         # ifctester does not keep the identifier when it re-reads a file, so the
         # report takes it from the build, in document order.
         for index, spec in enumerate(document.specifications):
             applicable = len(spec.applicable_entities)
             failures = len(spec.failed_entities)
             ok = bool(spec.status) and failures == 0
-            passed += 1 if ok else 0
-            failed += 0 if ok else 1
+            # An optional specification with nothing to apply to passes in IDS,
+            # but it has checked nothing, so it is not counted as satisfied.
+            status = "failed" if not ok else "passed" if applicable else "not_applicable"
+            counts[status] += 1
             specifications.append({
                 "name": spec.name,
                 "identifier": spec.identifier or (
                     identifiers[index] if index < len(identifiers) else str(index + 1)),
                 "applicable": applicable,
                 "failures": failures,
-                "passed": ok,
+                "passed": status == "passed",
+                "status": status,
             })
 
-    return {
-        "specifications": len(specifications),
-        "passed": passed,
-        "failed": failed,
-        "results": specifications,
-    }
+    return {"specifications": len(specifications), **counts, "results": specifications}

@@ -1,0 +1,32 @@
+{# Right pane: the plan's requirements as IDS, one milestone at a time, and
+   how each attached model meets them. A plan relates to IDS documents and to
+   models one-to-many, so the milestone chosen here drives both the download
+   and the check, and every model is reported on its own. #}
+<div class="props" data-req
+     data-loin-url="{{ loin_url }}">
+  <div class="rail-section">
+    <div class="req-head">
+      <span class="eyebrow grow">{{ t('req.milestone') }}</span>
+      <span class="seg" role="group" data-req-milestones></span>
+    </div>
+    <div class="req-note muted" data-req-source>{{ t('req.milestone_source') }}</div>
+  </div>
+
+  <div class="rail-section">
+    <div class="req-head">
+      <span class="eyebrow grow">{{ t('req.document') }} <span data-req-scope></span></span>
+      <a class="btn primary sm" data-req-download href="{{ url_for('api.export_ids', slug=project.slug) }}">{{ t('req.download') }}</a>
+    </div>
+    <div class="req-note" data-req-summary></div>
+    <div data-req-notes></div>
+  </div>
+
+  <div class="rail-section">
+    <div class="req-head">
+      <span class="eyebrow grow">{{ t('req.check') }} <span data-req-model-count></span></span>
+      <button class="btn sm" type="button" data-req-run>{{ t('req.run') }}</button>
+    </div>
+    <div class="req-note muted">{{ t('req.check_hint') }}</div>
+    <div data-req-models><p class="muted req-empty">{{ t('req.not_run') }}</p></div>
+  </div>
+</div>
