@@ -284,7 +284,7 @@ bepkit/
 
 ```bash
 pip install -e ".[dev]"
-pytest -q        # 169 tests
+pytest -q        # 197 tests
 ```
 
 Optional-dependency tests skip when the dependency is absent. No test needs a model server
@@ -299,6 +299,7 @@ BIMForum LOD Specification · buildingSMART IDS 1.0 · IFC2X3 / IFC4
 
 | Version | Date | Change |
 | --- | --- | --- |
+| 0.4.2 | 2026-10-29 | Requirements match IFC subtypes; bad input no longer crashes |
 | 0.4.1 | 2026-10-27 | Public demo app on Fly.io |
 | 0.4.0 | 2026-10-26 | *Requirements* tab: one milestone, its IDS, every model checked; N/A instead of a false pass |
 | 0.3.0 | 2026-10-25 | IDS by milestone, each model checked in its own schema, data responsibility matrix |

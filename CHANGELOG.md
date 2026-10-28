@@ -3,6 +3,22 @@
 Versions follow semantic versioning: a minor number for new features, a patch number for
 fixes and documentation. Each version is tagged in git (`v0.4.0`).
 
+## 0.4.2 — 2026-10-29 — Fixes from an end-to-end pass
+
+- A requirement on a class also covers its instantiable subtypes, so `IfcWall` now
+  matches the `IfcWallStandardCase` elements an IFC2X3 export is made of
+  (`ids.include_subtypes`). On the Duplex model it now covers 57 walls instead of 1.
+- Plural element names infer their class: *Windows* → `IfcWindow`.
+- The viewer reloads a script dropped while the server wakes, and says so when it
+  cannot; an upload that succeeded is no longer reported as failed.
+- A rejected upload leaves no broken model in the list.
+- Malformed API input returns 400 with a message instead of 500: a JSON body that is
+  not an object, `null` text fields, a malformed import, a non-numeric model id.
+- A batch of values with one bad value applies none of them.
+- Settings refuse a blank name or an unknown stage instead of crashing.
+- The JSON export API returns Word documents as base64.
+- New end-to-end test of a plan built from scratch.
+
 ## 0.4.1 — 2026-10-27 — Demo app on Fly.io
 
 - The README links a public demo app at https://bepbench.fly.dev/, with the sample plan and

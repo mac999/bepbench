@@ -204,6 +204,38 @@
     });
   }
 
+  // A script dropped on the way in (a reset connection as the server wakes)
+  // leaves the viewer undefined. Fetch the missing ones again before giving up.
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      var tag = document.createElement("script");
+      tag.src = src + (src.indexOf("?") < 0 ? "?" : "&") + "retry=" + Date.now();
+      tag.onload = resolve;
+      tag.onerror = reject;
+      document.head.appendChild(tag);
+    });
+  }
+  function ensureViewer() {
+    function source(name) {
+      var tag = document.querySelector('script[src*="' + name + '"]');
+      return tag ? tag.getAttribute("src").split("?")[0] : null;
+    }
+    var chain = Promise.resolve();
+    if (!window.THREE) {
+      chain = chain.then(function () { return loadScript(source("three.min.js")); })
+        .then(function () { return loadScript(source("js/viewer.js")); });
+    } else if (!window.BEPViewer) {
+      chain = chain.then(function () { return loadScript(source("js/viewer.js")); });
+    }
+    return chain.then(function () {
+      if (!window.THREE || !window.BEPViewer) throw new Error("viewer missing");
+    });
+  }
+  function viewerMissing() {
+    setOverlay('<div class="muted">' + esc(s("viewer_missing", "The 3D viewer did not load. Reload the page.")) +
+      "</div>", true);
+  }
+
   function upload(file) {
     setOverlay('<div><span class="spin"></span> ' + esc(s("viewer_uploading", "Uploading…")) + "</div>");
     var form = new FormData();
@@ -215,9 +247,12 @@
           setOverlay('<div class="muted">' + esc(result.body.error || "Upload failed") + "</div>", true);
           return;
         }
-        return refreshModels(result.body.id);
+        // The file is stored from here on; a viewer problem is not an upload failure.
+        return refreshModels(result.body.id).catch(viewerMissing);
       })
-      .catch(function () { setOverlay('<div class="muted">Upload failed</div>', true); });
+      .catch(function () {
+        setOverlay('<div class="muted">' + esc(s("viewer_upload_failed", "Upload failed")) + "</div>", true);
+      });
   }
 
   function refreshModels(selectId) {
@@ -273,6 +308,10 @@
 
   function loadModel(model) {
     if (!model) return;
+    if (!viewer && (!window.THREE || !window.BEPViewer)) {
+      setOverlay('<div><span class="spin"></span></div>');
+      return ensureViewer().then(function () { return loadModel(model); }, viewerMissing);
+    }
     activeModel = model;
     document.querySelectorAll("[data-model-row]").forEach(function (row) {
       row.classList.toggle("on", parseInt(row.getAttribute("data-model-row"), 10) === model.id);
@@ -679,7 +718,7 @@
         });
         // Inferred classes are expected, not faults: one line, the rows listed in its detail.
         if ((b.inferred || []).length) {
-          html.push(issueRow("minor", fmt(s("req_inferred", "{count} classes inferred from element names"),
+          html.push(issueRow("minor", fmt(s("req_inferred", "Classes inferred from element names: {count}"),
             { count: b.inferred.length }),
             b.inferred.map(function (i) { return i.element + ": " + i.reason; }).join(" · ")));
         }

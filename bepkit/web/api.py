@@ -6,12 +6,14 @@ integration surface for CI checks or a CDE hook that wants a project's score.
 
 from __future__ import annotations
 
+import base64
+import os
 from typing import Any
 
 from flask import Blueprint, jsonify, request
 
 from .. import services
-from ..exporters import render as render_export
+from ..exporters import is_binary, render as render_export, render_bytes
 from ..schema import available_frameworks, get_framework
 
 api_bp = Blueprint("api", __name__)
@@ -24,6 +26,25 @@ def _error(message: str, status: int = 400):
 @api_bp.errorhandler(services.ServiceError)
 def _service_error(exc):  # pragma: no cover - wired through Flask
     return _error(str(exc))
+
+
+class _BadBody(Exception):
+    pass
+
+
+@api_bp.errorhandler(_BadBody)
+def _bad_body(exc):  # pragma: no cover - wired through Flask
+    return _error(str(exc))
+
+
+def _body() -> dict[str, Any]:
+    """The request's JSON object; anything else is the caller's mistake, not a crash."""
+    body = request.get_json(silent=True)
+    if body is None:
+        return {}
+    if not isinstance(body, dict):
+        raise _BadBody("send a JSON object")
+    return body
 
 
 def _load(slug: str):
@@ -97,7 +118,7 @@ def list_projects():
 
 @api_bp.post("/projects")
 def create_project():
-    body = request.get_json(silent=True) or {}
+    body = _body()
     try:
         project = services.create_project(
             name=body.get("name", ""),
@@ -127,7 +148,7 @@ def patch_project(slug: str):
         project = _load(slug)
     except services.ServiceError as exc:
         return _error(str(exc), 404)
-    services.update_project(project, **(request.get_json(silent=True) or {}))
+    services.update_project(project, **_body())
     return jsonify(project.to_dict())
 
 
@@ -153,7 +174,7 @@ def put_values(slug: str):
     except services.ServiceError as exc:
         return _error(str(exc), 404)
 
-    body = request.get_json(silent=True) or {}
+    body = _body()
     updates = body.get("values", body)
     if not isinstance(updates, dict) or not updates:
         return _error("send a JSON object of section.field -> value")
@@ -199,11 +220,17 @@ def export(slug: str):
     fmt = request.args.get("format", "md")
     framework = services.framework_for(project)
     report = services.score_project(project)
+    include_score = request.args.get("score", "1") != "0"
     try:
-        body = render_export(fmt, project, framework, report,
-                             include_score=request.args.get("score", "1") != "0")
+        if is_binary(fmt):  # Word and the like travel as base64 inside the JSON
+            data = render_bytes(fmt, project, framework, report, include_score=include_score)
+            return jsonify(format=fmt, encoding="base64",
+                           content=base64.b64encode(data).decode("ascii"))
+        body = render_export(fmt, project, framework, report, include_score=include_score)
     except ValueError as exc:
         return _error(str(exc))
+    except RuntimeError as exc:          # an optional exporter is not installed
+        return _error(str(exc), 503)
     return jsonify(format=fmt, content=body)
 
 
@@ -222,14 +249,14 @@ def create_snapshot(slug: str):
         project = _load(slug)
     except services.ServiceError as exc:
         return _error(str(exc), 404)
-    body = request.get_json(silent=True) or {}
+    body = _body()
     snapshot = services.take_snapshot(project, body.get("label", ""))
     return jsonify(snapshot.to_dict()), 201
 
 
 @api_bp.post("/import")
 def import_project():
-    body = request.get_json(silent=True) or {}
+    body = _body()
     try:
         project = services.import_dict(body)
     except services.ServiceError as exc:
@@ -264,7 +291,7 @@ def assist(slug: str):
     except services.ServiceError as exc:
         return _error(str(exc), 404)
 
-    body = request.get_json(silent=True) or {}
+    body = _body()
     path = body.get("path", "")
     if "." not in path:
         return _error("send a 'path' of the form section.field")
@@ -346,6 +373,8 @@ def model_index(slug: str, model_id: int):
         model = services.get_model(project, model_id)
     except services.ServiceError as exc:
         return _error(str(exc), 404)
+    if model.status != "ready" or not os.path.isfile(model.index_path):
+        return _error(model.error or "this model has no viewer data; upload it again", 404)
     return send_file(model.index_path, mimetype="application/json",
                      max_age=0, conditional=True, etag=True)
 
@@ -359,6 +388,8 @@ def model_buffer(slug: str, model_id: int):
         model = services.get_model(project, model_id)
     except services.ServiceError as exc:
         return _error(str(exc), 404)
+    if model.status != "ready" or not os.path.isfile(model.buffer_path):
+        return _error(model.error or "this model has no viewer data; upload it again", 404)
     return send_file(model.buffer_path, mimetype="application/octet-stream",
                      max_age=0, conditional=True, etag=True)
 
@@ -467,7 +498,7 @@ def check_ids(slug: str):
     except services.ServiceError as exc:
         return _error(str(exc), 404)
 
-    body = request.get_json(silent=True) or {}
+    body = _body()
     model_ids = body.get("model_ids") or ([body["model_id"]] if body.get("model_id") else None)
     try:
         report = services.check_ids(project, model_ids=model_ids, **_ids_options(body))

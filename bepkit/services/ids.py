@@ -96,7 +96,10 @@ def _targets(project: Project, model_ids: Iterable[int] | None,
         return [{"model_id": None, "filename": Path(model_path).name,
                  "schema": file_schema(model_path), "path": model_path}]
     models = list_models(project)
-    wanted = [int(i) for i in (model_ids or []) if i not in (None, "")]
+    try:
+        wanted = [int(i) for i in (model_ids or []) if i not in (None, "")]
+    except (TypeError, ValueError) as exc:
+        raise IdsError(f"model ids must be numbers: {exc}") from exc
     if wanted:
         unknown = sorted(set(wanted) - {m.id for m in models})
         if unknown:

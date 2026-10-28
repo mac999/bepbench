@@ -275,6 +275,8 @@
     "_pset_comment": "A property written as Pset_DoorCommon.FireRating in the table is required in that property set. One written without a set goes into default_pset.",
     "property_split": "[,;/]| and ",
     "data_type": "IFCLABEL",
+    "include_subtypes": true,
+    "_include_subtypes_comment": "An IDS entity facet matches its class exactly. When true, a requirement on IfcWall also applies to its instantiable subtypes (IfcWallStandardCase), those defined in every target schema.",
     "required_attributes": [
       "Name"
     ],

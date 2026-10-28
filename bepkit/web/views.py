@@ -266,16 +266,20 @@ def settings(slug: str):
 @web_bp.post("/p/<slug>/settings")
 def update_settings(slug: str):
     project = _project_or_404(slug)
-    services.update_project(
-        project,
-        name=request.form.get("name"),
-        client=request.form.get("client"),
-        reference=request.form.get("reference"),
-        owner=request.form.get("owner"),
-        status=request.form.get("status"),
-        stage=request.form.get("stage"),
-        notes=request.form.get("notes"),
-    )
+    try:
+        services.update_project(
+            project,
+            name=request.form.get("name"),
+            client=request.form.get("client"),
+            reference=request.form.get("reference"),
+            owner=request.form.get("owner"),
+            status=request.form.get("status"),
+            stage=request.form.get("stage"),
+            notes=request.form.get("notes"),
+        )
+    except services.ServiceError as exc:
+        flash(str(exc), "error")
+        return redirect(url_for("web.settings", slug=project.slug))
     flash("Project details updated.", "success")
     return redirect(url_for("web.settings", slug=project.slug))
 

@@ -158,9 +158,9 @@ def create_project(
         slug=unique_slug(slug or name),
         name=name.strip(),
         framework_id=framework_id,
-        client=client.strip(),
-        reference=reference.strip(),
-        owner=owner.strip(),
+        client=(client or "").strip(),
+        reference=(reference or "").strip(),
+        owner=(owner or "").strip(),
         stage=stage,
     )
     db.session.add(project)
@@ -192,6 +192,8 @@ def _seed_header_fields(project: Project) -> None:
 def update_project(project: Project, **attrs: Any) -> Project:
     if attrs.get("stage") and attrs["stage"] not in STAGES:
         raise ServiceError(f"unknown stage '{attrs['stage']}' (use: {', '.join(STAGES)})")
+    if "name" in attrs and attrs["name"] is not None and not str(attrs["name"]).strip():
+        raise ServiceError("project name is required")
     for key in ("name", "client", "reference", "status", "owner", "notes", "stage"):
         if key in attrs and attrs[key] is not None:
             setattr(project, key, str(attrs[key]).strip())
@@ -257,12 +259,16 @@ def set_value(
 def set_values(project: Project, updates: dict[str, Any], *, author: str = "") -> int:
     """Apply a ``{"section.field": value}`` batch in one transaction."""
     count = 0
-    for path, raw in updates.items():
-        if "." not in path:
-            raise ServiceError(f"'{path}' is not a section.field path")
-        section_id, field_id = path.split(".", 1)
-        set_value(project, section_id, field_id, raw, author=author, commit=False)
-        count += 1
+    try:
+        for path, raw in updates.items():
+            if "." not in path:
+                raise ServiceError(f"'{path}' is not a section.field path")
+            section_id, field_id = path.split(".", 1)
+            set_value(project, section_id, field_id, raw, author=author, commit=False)
+            count += 1
+    except ServiceError:
+        db.session.rollback()  # all or nothing: a bad value must not leave its batch half-applied
+        raise
     db.session.commit()
     return count
 
@@ -334,7 +340,13 @@ def export_dict(project: Project) -> dict[str, Any]:
 
 
 def import_dict(payload: dict[str, Any], *, slug: str | None = None) -> Project:
+    if not isinstance(payload, dict):
+        raise ServiceError("import payload must be a JSON object")
     meta = payload.get("project") or {}
+    values = payload.get("values") or {}
+    if not isinstance(meta, dict) or not isinstance(values, dict) or not all(
+            isinstance(fields, dict) for fields in values.values() if fields):
+        raise ServiceError("import payload must hold 'project' and 'values' objects")
     framework_id = meta.get("framework") or payload.get("framework")
     if not framework_id:
         raise ServiceError("import payload has no framework id")
@@ -348,7 +360,7 @@ def import_dict(payload: dict[str, Any], *, slug: str | None = None) -> Project:
         stage=meta.get("stage") or "delivery",
     )
     skipped = 0
-    for section_id, fields in (payload.get("values") or {}).items():
+    for section_id, fields in values.items():
         for field_id, value in (fields or {}).items():
             try:
                 set_value(project, section_id, field_id, value, commit=False)

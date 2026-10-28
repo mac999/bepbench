@@ -78,9 +78,10 @@ def attach_model(
     try:
         index = tessellate(source, directory / "model.bin", directory / "model.json")
     except IfcError as exc:
-        model.status = "failed"
-        model.error = str(exc)
+        # A rejected upload leaves nothing behind: no row the viewer cannot open.
+        db.session.delete(model)
         db.session.commit()
+        shutil.rmtree(directory, ignore_errors=True)
         raise ServiceError(str(exc)) from exc
 
     model.status = "ready"

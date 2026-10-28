@@ -60,6 +60,11 @@ IFC4X3. Aimed at an IFC4 model, a specification for it would match nothing and p
 row is listed as skipped instead, or the specification is narrowed to the schemas that
 define the class.
 
+**A requirement covers the class and its subtypes.** An IDS entity facet matches one
+class exactly, and IFC2X3 exports write most walls as `IfcWallStandardCase`. A row for
+`IfcWall` therefore lists the instantiable subtypes every target schema defines;
+`ids.include_subtypes` turns this off.
+
 **Requirements name real property sets.** `Pset_DoorCommon.FireRating` in the table is
 required in `Pset_DoorCommon`, which is where authoring tools write it. A property written
 without a set goes into `ids.default_pset`, and the export says how many did.

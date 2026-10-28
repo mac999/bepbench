@@ -95,10 +95,22 @@ def loin_source(framework_id: str) -> dict[str, Any]:
     return source
 
 
+def _singulars(word: str) -> set[str]:
+    """A word and its likely singulars, so "Doors" and "Facilities" find their hints."""
+    forms = {word}
+    if len(word) > 4 and word.endswith("ies"):
+        forms.add(word[:-3] + "y")
+    if len(word) > 3 and word.endswith("es"):
+        forms.add(word[:-2])
+    if len(word) > 3 and word.endswith("s") and not word.endswith("ss"):
+        forms.add(word[:-1])
+    return forms
+
+
 def infer_ifc_class(text: str) -> str | None:
     """Best-effort IFC class from an element name, using the configured hints."""
     needle = re.sub(r"[^a-z0-9 ]", " ", (text or "").lower())
-    words = set(needle.split())
+    words = {form for word in needle.split() for form in _singulars(word)}
     best: tuple[int, str] | None = None
     for keyword, ifc_class in (setting("ids.class_hints", {}) or {}).items():
         key = keyword.lower()
@@ -179,6 +191,43 @@ def schemas_defining(ifc_class: str, versions: list[str]) -> list[str]:
         if declaration.as_entity() is not None:
             found.append(version)
     return found
+
+
+def concrete_subtypes(ifc_class: str, versions: list[str]) -> list[str]:
+    """Instantiable subtypes of ``ifc_class`` defined in every one of ``versions``.
+
+    An IDS entity facet matches its class exactly, so a requirement on IfcWall
+    would miss every IfcWallStandardCase an IFC2X3 export is full of.
+    """
+    common: set[str] | None = None
+    for version in versions:
+        schema = _schema(version)
+        if schema is None:
+            return []
+        try:
+            entity = schema.declaration_by_name(ifc_class).as_entity()
+        except Exception:
+            return []
+        if entity is None:
+            return []
+        found: set[str] = set()
+        stack = list(entity.subtypes())
+        while stack:
+            sub = stack.pop()
+            if not sub.is_abstract():
+                found.add(sub.name().upper())
+            stack.extend(sub.subtypes())
+        common = found if common is None else common & found
+    return sorted(common or [])
+
+
+def _entity_name(ifc_class: str, versions: list[str]) -> Any:
+    names = [ifc_class.upper()]
+    if setting("ids.include_subtypes", True):
+        names += [n for n in concrete_subtypes(ifc_class, versions) if n not in names]
+    if len(names) == 1:
+        return names[0]
+    return ids_model.Restriction(options={"enumeration": names}, base="string")
 
 
 def milestone_column(framework_id: str) -> str:
@@ -304,7 +353,7 @@ def build(
             minOccurs=setting("ids.min_occurs", 0),
             maxOccurs=setting("ids.max_occurs", "unbounded"),
         )
-        spec.applicability.append(ids_model.Entity(name=ifc_class.upper()))
+        spec.applicability.append(ids_model.Entity(name=_entity_name(ifc_class, list(targets))))
 
         for attribute in setting("ids.required_attributes", ["Name"]) or []:
             spec.requirements.append(ids_model.Attribute(
