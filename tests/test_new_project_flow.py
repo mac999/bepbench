@@ -238,3 +238,9 @@ def test_the_editor_offers_the_viewer_retry_strings(client, project):
         if "data-strings='" in page else None
     assert strings is None or {"viewer_missing", "viewer_upload_failed"} <= set(strings)
     assert "viewer_missing" in page
+
+
+def test_the_hidden_attribute_wins_over_component_display(client):
+    # .viewer-overlay sets display: grid; without this rule its spinner never hid.
+    css = client.get("/static/css/app.css").get_data(as_text=True)
+    assert "[hidden] { display: none !important; }" in css

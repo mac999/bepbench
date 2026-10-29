@@ -89,6 +89,8 @@
 }
 
 * { box-sizing: border-box; }
+/* A component's own display value must not override the hidden attribute. */
+[hidden] { display: none !important; }
 html, body { height: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);

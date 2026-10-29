@@ -3,6 +3,11 @@
 Versions follow semantic versioning: a minor number for new features, a patch number for
 fixes and documentation. Each version is tagged in git (`v0.4.0`).
 
+## 0.4.3 — 2026-10-30 — Viewer spinner fix
+
+- The loading spinner over the 3D view clears once the model is shown. The overlay's own
+  `display` overrode the `hidden` attribute; a global `[hidden]` rule now wins.
+
 ## 0.4.2 — 2026-10-29 — Fixes from an end-to-end pass
 
 - A requirement on a class also covers its instantiable subtypes, so `IfcWall` now
