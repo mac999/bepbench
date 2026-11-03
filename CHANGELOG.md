@@ -3,6 +3,14 @@
 Versions follow semantic versioning: a minor number for new features, a patch number for
 fixes and documentation. Each version is tagged in git (`v0.4.0`).
 
+## 0.7.1 — 2026-11-04 — Property data types from the Pset template
+
+- A property facet requires the data type its standard property set template defines, so
+  `Pset_WallCommon.IsExternal` asks for an `IfcBoolean` instead of failing every wall for
+  not being an `IfcLabel`. A property no template defines is left open to any type.
+  `ids.data_type` set to a value forces that type on every property as before;
+  `ids.data_types` names one per property.
+
 ## 0.7.0 — 2026-11-04 — bSDD dictionary URIs
 
 - The classification facet carries the bSDD URI of the system the plan names, resolved from

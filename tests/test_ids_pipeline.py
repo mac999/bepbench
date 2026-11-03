@@ -413,3 +413,13 @@ def test_the_report_and_the_editor_carry_the_bsdd_dictionary(client, plan):
     page = client.get(f"/p/{plan.slug}/s/standards_methods").get_data(as_text=True)
     assert 'list="suggest-classification-classification_systems"' in page
     assert 'value="Uniclass 2015"' in page and 'value="CCI Construction"' in page
+
+
+def test_a_boolean_property_in_a_real_model_passes_its_template_type(plan):
+    from bepkit import services
+
+    services.set_values(plan, {"information_requirements.loin": [
+        dict(WALL, alphanumeric="Pset_WallCommon.IsExternal")]})
+    report = services.check_ids(plan, model_path=str(DUPLEX))
+    walls = report["results"][0]
+    assert walls["status"] == "passed" and walls["applicable"] > 1

@@ -291,7 +291,7 @@ bepkit/
 
 ```bash
 pip install -e ".[dev]"
-pytest -q        # 210 tests
+pytest -q        # 212 tests
 ```
 
 Optional-dependency tests skip when the dependency is absent. No test needs a model server
@@ -306,6 +306,7 @@ BIMForum LOD Specification · buildingSMART IDS 1.0 · IFC2X3 / IFC4
 
 | Version | Date | Change |
 | --- | --- | --- |
+| 0.7.1 | 2026-11-04 | Property data types follow the standard Pset template |
 | 0.7.0 | 2026-11-04 | Classification facet points at its bSDD dictionary |
 | 0.6.0 | 2026-11-04 | Check failures download as BCF 2.1 issues |
 | 0.5.0 | 2026-11-04 | IFC Class column offers the schema class list; `bep ids classes` |

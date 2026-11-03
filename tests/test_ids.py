@@ -170,3 +170,23 @@ def test_bsdd_names_match_whole_words_offline_and_the_api_only_when_asked(monkey
         raise OSError("no network")
     monkeypatch.setattr(bsdd, "fetch_dictionaries", offline)
     assert classification_uri("MasterFormat", lookup=True) == ""
+
+
+def test_property_data_types_follow_the_standard_template_unless_forced():
+    from bepkit.ids import build, property_data_type
+    from bepkit.settings import override
+
+    assert property_data_type("Pset_WallCommon", "IsExternal", ["IFC2X3"]) == "IFCBOOLEAN"
+    assert property_data_type("Pset_WallCommon", "isexternal", ["IFC4X3_ADD2"]) == "IFCBOOLEAN"
+    assert property_data_type("Pset_DoorCommon", "FireRating", ["IFC4"]) == "IFCLABEL"
+    assert property_data_type("BEP_Requirements", "Grade", ["IFC4"]) is None
+
+    row = dict(WALL_ROW, alphanumeric="Pset_WallCommon.IsExternal, Grade")
+    xml = build(FakeProject(), _framework(), _values([row])).xml
+    assert 'dataType="IFCBOOLEAN"' in xml and xml.count("dataType=") == 1
+
+    override("ids.data_types", {"grade": "IfcText"})
+    assert property_data_type("BEP_Requirements", "Grade", ["IFC4"]) == "IFCTEXT"
+    override("ids.data_type", "IFCLABEL")
+    assert property_data_type("Pset_WallCommon", "IsExternal", ["IFC2X3"]) == "IFCLABEL"
+    assert property_data_type("BEP_Requirements", "Grade", ["IFC4"]) == "IFCTEXT"

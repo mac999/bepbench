@@ -253,6 +253,44 @@ def known_classes(versions: Any = None, root: str | None = None) -> list[dict[st
     return [{"name": name, "schemas": schemas} for name, schemas in sorted(found.items())]
 
 
+_pset_templates: dict[str, Any] = {}
+
+
+def property_data_type(pset_name: str, base_name: str, versions: list[str]) -> str | None:
+    """The IFC data type a property facet should require, or None to leave it open.
+
+    ``ids.data_types`` names a type per property; a non-empty ``ids.data_type``
+    forces one type on every property; otherwise the standard property set
+    template says (Pset_WallCommon.IsExternal is an IfcBoolean), and a property
+    no template defines gets none, since any type a checker finds is acceptable.
+    """
+    explicit = {str(k).lower(): str(v).upper()
+                for k, v in (setting("ids.data_types", {}) or {}).items()}
+    if base_name.lower() in explicit:
+        return explicit[base_name.lower()]
+    forced = str(setting("ids.data_type", "") or "").strip()
+    if forced:
+        return forced.upper()
+    try:
+        import ifcopenshell.util.pset as pset_util
+    except ImportError:  # pragma: no cover - ifctester brings ifcopenshell
+        return None
+    for version in versions:
+        schema = version.split("_")[0]
+        if schema not in _pset_templates:
+            try:
+                _pset_templates[schema] = pset_util.PsetQto(schema)
+            except Exception:
+                _pset_templates[schema] = None
+        templates = _pset_templates[schema]
+        template = templates.get_by_name(pset_name) if templates else None
+        for prop in getattr(template, "HasPropertyTemplates", None) or []:
+            if str(prop.Name).lower() == base_name.lower():
+                measure = getattr(prop, "PrimaryMeasureType", None)
+                return str(measure).upper() if measure else None
+    return None
+
+
 def _entity_name(ifc_class: str, versions: list[str]) -> Any:
     names = [ifc_class.upper()]
     if setting("ids.include_subtypes", True):
@@ -323,7 +361,6 @@ def build(
     for version in versions:
         _schema(version)  # fail early and clearly on a misspelt schema
     pset = default_pset or setting("ids.default_pset", "BEP_Requirements")
-    data_type = setting("ids.data_type", "IFCLABEL")
     identifier_format = setting("ids.identifier_format", "LOIN-{index:03d}")
 
     document = ids_model.Ids(
@@ -403,11 +440,12 @@ def build(
             qualified_set, base = split_qualified(name)
             if not qualified_set:
                 result.default_pset_properties += 1
+            property_set = qualified_set or pset
+            base_name = base if qualified_set else _pascal(name)
             spec.requirements.append(ids_model.Property(
-                propertySet=qualified_set or pset,
-                baseName=base if qualified_set else _pascal(name),
-                dataType=data_type, cardinality="required",
-                instructions=name,
+                propertySet=property_set, baseName=base_name,
+                dataType=property_data_type(property_set, base_name, list(targets)),
+                cardinality="required", instructions=name,
             ))
 
         document.specifications.append(spec)

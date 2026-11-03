@@ -102,7 +102,7 @@ same name, on `bep ids export`, `bep ids check` and the HTTP API.
 | `ids.default_pset` | `--default-pset` | Property set for a property written without one |
 | `ids.pset_separator` | | Separator in `Pset_DoorCommon.FireRating` (default `.`) |
 | `ids.property_split` | | Pattern that splits the table's property list |
-| `ids.data_type` | | IFC data type required of each property (default `IFCLABEL`) |
+| `ids.data_type`, `ids.data_types` | | Data type required of each property: from the standard Pset template by default, one type forced for all, or a type per property name |
 | `ids.required_attributes` | | Attributes every element must carry (default `Name`) |
 | `ids.min_occurs`, `ids.max_occurs` | | Cardinality of each specification |
 | `ids.identifier_format` | | Specification id, e.g. `LOIN-{index:03d}` |
