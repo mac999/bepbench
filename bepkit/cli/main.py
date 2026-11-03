@@ -799,11 +799,13 @@ def ids_export(ctx: Context, slug: str, out: str | None, split: bool, as_json: b
 @click.option("--model-id", type=int, multiple=True,
               help="Check this attached model; repeatable. Default: every attached model.")
 @click.option("--fail-on-error", is_flag=True, help="Exit non-zero if any specification fails.")
+@click.option("--bcf", "bcf_dir", type=click.Path(file_okay=False), metavar="DIR",
+              help="Write each model's failures as a BCF 2.1 file into DIR [ids.bcf_filename].")
 @_ids_options
 @pass_ctx
 def ids_check(ctx: Context, slug: str, model: str | None, model_id: tuple[int, ...],
-              fail_on_error: bool, as_json: bool, ifc_version: tuple[str, ...],
-              milestone: str | None, default_pset: str | None) -> None:
+              fail_on_error: bool, bcf_dir: str | None, as_json: bool,
+              ifc_version: tuple[str, ...], milestone: str | None, default_pset: str | None) -> None:
     """Validate IFC models against the requirements the plan states."""
     from ..ids import IdsError
 
@@ -842,8 +844,42 @@ def ids_check(ctx: Context, slug: str, model: str | None, model_id: tuple[int, .
                    f" across {len(report['models'])} model(s)"
                    + (f", {report['not_applicable']} with nothing to apply to"
                       if report["not_applicable"] else ""))
+    if bcf_dir:
+        written = _write_bcf(project, report, bcf_dir, model, list(ifc_version) or None,
+                             milestone, default_pset)
+        if as_json:
+            click.echo(json.dumps({"bcf": written}, indent=2, ensure_ascii=False))
+        else:
+            for item in written:
+                click.echo(f"  {item['path']}  ({item['topics']} issues)")
+            if not written:
+                click.secho("  nothing failed, so no BCF was written", dim=True)
     if fail_on_error and report["failed"]:
         sys.exit(4)
+
+
+def _write_bcf(project: Any, report: dict[str, Any], out_dir: str, model_path: str | None,
+               ifc_version: list[str] | None, milestone: str | None,
+               default_pset: str | None) -> list[dict[str, Any]]:
+    """A .bcf per model that failed something, so a clean check writes nothing."""
+    from ..ids import IdsError
+
+    written: list[dict[str, Any]] = []
+    os.makedirs(out_dir, exist_ok=True)
+    for entry in report["models"]:
+        if entry.get("error") or not entry.get("failed"):
+            continue
+        try:
+            result = services.export_bcf(
+                project, model_id=entry.get("model_id"), model_path=model_path,
+                ifc_version=ifc_version, milestone=milestone, default_pset=default_pset)
+        except IdsError as exc:
+            fail(str(exc))
+        path = os.path.join(out_dir, result["filename"])
+        with open(path, "wb") as handle:
+            handle.write(result["content"])
+        written.append({"model": entry["model"], "path": path, "topics": result["topics"]})
+    return written
 
 
 @cli.command("diff")

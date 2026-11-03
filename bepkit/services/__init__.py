@@ -1,6 +1,8 @@
 from .diff import compare, compare_snapshot_to_current, compare_snapshots
 from .ids import (
+    bcf_filename,
     check_ids,
+    export_bcf,
     export_ids,
     export_ids_split,
     file_schema,

@@ -18,6 +18,7 @@ from ..ids import (
     BuildResult,
     IdsError,
     build,
+    build_bcf,
     milestone_column,
     milestones,
     normalise_schema,
@@ -111,6 +112,45 @@ def _targets(project: Project, model_ids: Iterable[int] | None,
              "path": m.source_path} for m in models]
 
 
+def _versions_for(schema: str, explicit: list[str] | None, from_model: bool | None) -> list[str]:
+    """The target schema: what was asked for, else the model's own, else the setting."""
+    if from_model is None:
+        from_model = bool(setting("ids.ifc_version_from_model", True))
+    if explicit:
+        return explicit
+    if from_model and schema:
+        return [schema]
+    return resolve_versions(None)
+
+
+def bcf_filename(project: Project, model_name: str, milestone: str = "") -> str:
+    pattern = setting("ids.bcf_filename", "{slug}-{model}.bcf")
+    return pattern.format(slug=project.slug, model=slugify(Path(model_name).stem) or "model",
+                          milestone=slugify(milestone) or "all")
+
+
+def export_bcf(project: Project, *, model_id: int | None = None, model_path: str | None = None,
+               ifc_version: Any = None, milestone: str | None = None,
+               default_pset: str | None = None, from_model: bool | None = None) -> dict[str, Any]:
+    """One model's failures against the plan's requirements, as a BCF 2.1 file."""
+    target = _targets(project, [model_id] if model_id is not None else None, model_path)[0]
+    schema = normalise_schema(target["schema"]) if target["schema"] else ""
+    versions = _versions_for(schema, resolve_versions(ifc_version) if ifc_version else None, from_model)
+    result = export_ids(project, ifc_version=versions, milestone=milestone, default_pset=default_pset)
+    try:
+        content, summary = build_bcf(result.xml, target["path"], project=project,
+                                     model_name=target["filename"], milestone=result.milestone,
+                                     identifiers=result.identifiers)
+    except IdsError:
+        raise
+    except Exception as exc:  # an unreadable IFC is the author's to fix, not a crash
+        raise IdsError(f"could not read the model: {exc}") from exc
+    return {"model_id": target["model_id"], "model": target["filename"], "schema": schema,
+            "ifc_version": versions, "milestone": result.milestone,
+            "filename": bcf_filename(project, target["filename"], result.milestone),
+            "content": content, **summary}
+
+
 def check_ids(project: Project, *, model_ids: Iterable[int] | None = None,
               model_path: str | None = None, ifc_version: Any = None,
               milestone: str | None = None, default_pset: str | None = None,
@@ -120,20 +160,13 @@ def check_ids(project: Project, *, model_ids: Iterable[int] | None = None,
     The target schema is, in order: what the caller asked for, the model's own
     schema when ``ids.ifc_version_from_model`` is on, then ``ids.ifc_version``.
     """
-    if from_model is None:
-        from_model = bool(setting("ids.ifc_version_from_model", True))
     explicit = resolve_versions(ifc_version) if ifc_version else None
 
     reports: list[dict[str, Any]] = []
     errors: list[str] = []
     for target in _targets(project, model_ids, model_path):
         schema = normalise_schema(target["schema"]) if target["schema"] else ""
-        if explicit:
-            versions = explicit
-        elif from_model and schema:
-            versions = [schema]
-        else:
-            versions = resolve_versions(None)
+        versions = _versions_for(schema, explicit, from_model)
 
         entry: dict[str, Any] = {
             "model_id": target["model_id"],

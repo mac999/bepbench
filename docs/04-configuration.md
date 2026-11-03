@@ -108,6 +108,8 @@ same name, on `bep ids export`, `bep ids check` and the HTTP API.
 | `ids.identifier_format` | | Specification id, e.g. `LOIN-{index:03d}` |
 | `ids.title_format`, `ids.description_format`, `ids.document_version` | | Document header |
 | `ids.filename`, `ids.split_filename` | | Download and `--split` file names |
+| `ids.bcf_filename`, `ids.bcf_topic_per`, `ids.bcf_max_topics` | `--bcf` | BCF file name; one issue per `specification` or per `element`; cap on issues |
+| `ids.bcf_topic_type`, `ids.bcf_topic_status`, `ids.bcf_author`, `ids.bcf_title_format`, `ids.bcf_element_title_format` | | What each BCF issue carries |
 | `ids.classification_split`, `ids.classification_max_length` | | How the classification system name is cut from the plan's text |
 | `ids.sources.<framework>` | | Which table holds the LOIN, its columns, and where the classification is |
 | `ids.class_hints` | | Words in an element name mapped to an IFC class when none is stated |

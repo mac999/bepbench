@@ -3,6 +3,14 @@
 Versions follow semantic versioning: a minor number for new features, a patch number for
 fixes and documentation. Each version is tagged in git (`v0.4.0`).
 
+## 0.6.0 — 2026-11-04 — BCF issues from a check
+
+- A model's failures against the plan's requirements download as a BCF 2.1 file, one
+  issue per failed specification with every failing element in its viewpoint
+  (`ids.bcf_topic_per = element` for one issue each). The *Requirements* tab offers it
+  per model, `GET /api/projects/<slug>/models/<id>/bcf` serves it, and `bep ids check
+  --bcf DIR` writes one per failing model. Needs `bcf-client`, now part of the `ids` extra.
+
 ## 0.5.0 — 2026-11-04 — IFC class pick list
 
 - The *IFC Class* cell of the LOIN table offers every instantiable class the target schemas

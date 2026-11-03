@@ -1,3 +1,4 @@
+from .bcf import bcf_available, build_bcf
 from .builder import (
     IFCTESTER_AVAILABLE,
     BuildResult,
@@ -16,7 +17,7 @@ from .builder import (
     validate_against,
 )
 
-__all__ = ["build", "validate_against", "loin_source", "infer_ifc_class", "known_classes",
+__all__ = ["build", "build_bcf", "bcf_available", "validate_against", "loin_source", "infer_ifc_class", "known_classes",
            "split_properties", "split_qualified", "milestones", "milestone_column",
            "normalise_schema", "resolve_versions", "schemas_defining",
            "BuildResult", "IdsError", "IFCTESTER_AVAILABLE"]

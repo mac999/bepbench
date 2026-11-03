@@ -758,6 +758,11 @@
         esc(i.element) + '</span><span class="pill">' + esc(s("req_out_of_schema", "Not in schema")) +
         '</span><span class="why">' + esc(i.reason) + "</span></div>");
     });
+    if (entry.failed > 0 && entry.model_id != null) {
+      var href = api("/models/" + entry.model_id + "/bcf") + (reqMilestone ? "?milestone=" + encodeURIComponent(reqMilestone) : "");
+      rows.push('<div class="req-spec req-bcf"><a class="btn sm" href="' + esc(href) + '">' + esc(s("req_bcf", "Download BCF")) +
+        '</a><span class="why">' + esc(s("req_bcf_note", "")) + "</span></div>");
+    }
     if (entry.warning) rows.unshift('<div class="req-spec"><span class="why warn">' + esc(entry.warning) + "</span></div>");
     if (entry.error) rows.unshift('<div class="req-spec"><span class="why bad">' + esc(entry.error) + "</span></div>");
     if (!rows.length) rows.push('<div class="req-spec"><span class="why">' + esc(s("req_no_specs", "")) + "</span></div>");

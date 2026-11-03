@@ -507,6 +507,27 @@ def export_ids(slug: str):
     })
 
 
+@api_bp.get("/projects/<slug>/models/<int:model_id>/bcf")
+def export_bcf(slug: str, model_id: int):
+    """One model's failures against the plan's requirements, as a BCF 2.1 file."""
+    from flask import Response
+
+    from ..ids import IdsError
+
+    try:
+        project = _load(slug)
+    except services.ServiceError as exc:
+        return _error(str(exc), 404)
+    try:
+        result = services.export_bcf(project, model_id=model_id, **_ids_options(request.args))
+    except IdsError as exc:
+        return _error(str(exc), 404 if "no attached model" in str(exc) else 422)
+    return Response(result["content"], mimetype="application/zip", headers={
+        "Content-Disposition": f'attachment; filename="{result["filename"]}"',
+        "X-BCF-Topics": str(result["topics"]),
+    })
+
+
 @api_bp.post("/projects/<slug>/ids/check")
 def check_ids(slug: str):
     """Validate attached models against the plan's own requirements."""

@@ -339,3 +339,66 @@ def test_api_check_covers_every_attached_model(client, plan):
     report = client.post(f"/api/projects/{plan.slug}/ids/check", json={}).get_json()
     assert [m["model"] for m in report["models"]] == ["Duplex_A.ifc"]
     assert report["models"][0]["ifc_version"] == ["IFC2X3"]
+
+
+def _failing_plan(plan):
+    """FireRating without its set goes to the default pset, which no Duplex door carries."""
+    from bepkit import services
+
+    services.set_values(plan, {"information_requirements.loin": [dict(DOOR, alphanumeric="FireRating")]})
+    with open(DUPLEX, "rb") as handle:
+        return services.attach_model(plan, handle, "Duplex_A.ifc")
+
+
+def test_failures_become_bcf_issues_one_per_specification(plan):
+    import io
+    import zipfile
+
+    from bepkit import services
+
+    model = _failing_plan(plan)
+    result = services.export_bcf(plan, model_id=model.id)
+    assert result["filename"] == f"{plan.slug}-duplex-a.bcf"
+    assert result["topics"] == 1 and result["failed_specifications"] == 1
+    assert result["failed_elements"] > 1
+
+    archive = zipfile.ZipFile(io.BytesIO(result["content"]))
+    names = archive.namelist()
+    assert "bcf.version" in names and 'VersionId="2.1"' in archive.read("bcf.version").decode()
+    markup = archive.read([n for n in names if n.endswith("markup.bcf")][0]).decode()
+    assert "LOIN-001 Doors:" in markup and "TopicStatus=\"Open\"" in markup
+    viewpoint = archive.read([n for n in names if n.endswith(".bcfv")][0]).decode()
+    assert viewpoint.count("IfcGuid=") == result["failed_elements"]
+
+
+def test_bcf_can_make_one_issue_per_element_and_is_capped(plan):
+    from bepkit import services
+    from bepkit.settings import override
+
+    model = _failing_plan(plan)
+    override("ids.bcf_topic_per", "element")
+    override("ids.bcf_max_topics", 3)
+    result = services.export_bcf(plan, model_id=model.id)
+    assert result["topics"] == 3 and result["truncated"] is True
+
+
+def test_bcf_over_http(client, plan):
+    model = _failing_plan(plan)
+    response = client.get(f"/api/projects/{plan.slug}/models/{model.id}/bcf?milestone=4")
+    assert response.status_code == 200
+    assert response.mimetype == "application/zip" and response.headers["X-BCF-Topics"] == "1"
+    assert response.headers["Content-Disposition"].endswith('.bcf"')
+    assert client.get(f"/api/projects/{plan.slug}/models/999/bcf").status_code == 404
+    assert client.get(f"/api/projects/{plan.slug}/models/{model.id}/bcf?milestone=9").status_code == 422
+
+
+def test_cli_check_writes_a_bcf_per_failing_model(cli, tmp_path):
+    cli("set", "duplex", "information_requirements.loin", json.dumps([dict(DOOR, alphanumeric="FireRating")]))
+    result = cli("ids", "check", "duplex", str(DUPLEX), "--bcf", str(tmp_path), "--json")
+    assert result.exit_code == 0
+    written = list(tmp_path.glob("*.bcf"))
+    assert len(written) == 1 and written[0].name == "duplex-duplex-a.bcf" and written[0].stat().st_size > 0
+
+    cli("set", "duplex", "information_requirements.loin", json.dumps([DOOR]))
+    clean = cli("ids", "check", "duplex", str(DUPLEX), "--bcf", str(tmp_path / "clean"))
+    assert "no BCF was written" in clean.output and not list((tmp_path / "clean").glob("*.bcf"))

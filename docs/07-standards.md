@@ -70,6 +70,11 @@ class under `ids.class_root` in the schemas `ids.class_schemas` names, and marks
 of them defines. Typing stays allowed, since a house schema may add classes; `bep ids
 classes` prints the same list with the schemas defining each.
 
+**Failures leave as BCF, not as a report to retype.** A check's failures download as a
+BCF 2.1 file: one issue per failed specification, every failing element in its viewpoint,
+the requirement and the reasons in the description. Reviewers open it in the issue tool
+they already use. `ids.bcf_topic_per = element` makes one issue per element instead.
+
 **Requirements name real property sets.** `Pset_DoorCommon.FireRating` in the table is
 required in `Pset_DoorCommon`, which is where authoring tools write it. A property written
 without a set goes into `ids.default_pset`, and the export says how many did.
