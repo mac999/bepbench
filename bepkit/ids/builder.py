@@ -221,6 +221,33 @@ def concrete_subtypes(ifc_class: str, versions: list[str]) -> list[str]:
     return sorted(common or [])
 
 
+def known_classes(versions: Any = None, root: str | None = None) -> list[dict[str, Any]]:
+    """Instantiable classes under ``root`` in any of ``versions``, with the schemas defining each.
+
+    The pick list behind the LOIN table's IFC Class column, and ``bep ids classes``.
+    """
+    versions = resolve_versions(versions or setting("ids.class_schemas", ["IFC2X3", "IFC4"]))
+    root = root or setting("ids.class_root", "IfcProduct")
+    found: dict[str, list[str]] = {}
+    for version in versions:
+        schema = _schema(version)
+        if schema is None:
+            return []
+        try:
+            entity = schema.declaration_by_name(root).as_entity()
+        except Exception:
+            continue
+        if entity is None:
+            continue
+        stack = [entity]
+        while stack:
+            node = stack.pop()
+            if not node.is_abstract():
+                found.setdefault(node.name(), []).append(version)
+            stack.extend(node.subtypes())
+    return [{"name": name, "schemas": schemas} for name, schemas in sorted(found.items())]
+
+
 def _entity_name(ifc_class: str, versions: list[str]) -> Any:
     names = [ifc_class.upper()]
     if setting("ids.include_subtypes", True):

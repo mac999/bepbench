@@ -219,7 +219,7 @@ sections:
           - { id: element, label: Model Element, type: text, required: true }
           - { id: phase, label: Phase, type: text, required: true, width: "130px" }
           - { id: lod, label: LOD, type: select, options: ["100", "200", "300", "350", "400", "500"], required: true, width: "90px" }
-          - { id: ifc_class, label: IFC Class, type: text, width: "150px", placeholder: "IfcWall", help: "Used to generate a buildingSMART IDS." }
+          - { id: ifc_class, label: IFC Class, type: text, width: "150px", placeholder: "IfcWall", suggest: ifc_classes, help: "Used to generate a buildingSMART IDS. Pick from the list or type a class." }
           - { id: author, label: Element Author, type: text, required: true }
           - { id: notes, label: Notes, type: text }
 

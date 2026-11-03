@@ -277,6 +277,9 @@
     "data_type": "IFCLABEL",
     "include_subtypes": true,
     "_include_subtypes_comment": "An IDS entity facet matches its class exactly. When true, a requirement on IfcWall also applies to its instantiable subtypes (IfcWallStandardCase), those defined in every target schema.",
+    "class_root": "IfcProduct",
+    "class_schemas": ["IFC2X3", "IFC4", "IFC4X3_ADD2"],
+    "_class_comment": "The pick list offered in the table's IFC Class column and printed by bep ids classes: every instantiable class under class_root in any of class_schemas. A typed name none of them defines is marked, not refused.",
     "required_attributes": [
       "Name"
     ],

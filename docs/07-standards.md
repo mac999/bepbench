@@ -65,6 +65,11 @@ class exactly, and IFC2X3 exports write most walls as `IfcWallStandardCase`. A r
 `IfcWall` therefore lists the instantiable subtypes every target schema defines;
 `ids.include_subtypes` turns this off.
 
+**The IFC Class column offers the schemas' own list.** The cell suggests every instantiable
+class under `ids.class_root` in the schemas `ids.class_schemas` names, and marks a value none
+of them defines. Typing stays allowed, since a house schema may add classes; `bep ids
+classes` prints the same list with the schemas defining each.
+
 **Requirements name real property sets.** `Pset_DoorCommon.FireRating` in the table is
 required in `Pset_DoorCommon`, which is where authoring tools write it. A property written
 without a set goes into `ids.default_pset`, and the export says how many did.

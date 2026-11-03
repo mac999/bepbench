@@ -229,6 +229,18 @@
     });
   }
 
+  var suggestionSets = {};
+  function suggestionSet(root, name) {
+    var id = "suggest-" + root.getAttribute("data-field") + "-" + name;
+    if (!suggestionSets[id]) {
+      var list = document.getElementById(id);
+      suggestionSets[id] = new Set(list ? Array.prototype.map.call(list.options, function (o) {
+        return o.value.toLowerCase();
+      }) : []);
+    }
+    return suggestionSets[id];
+  }
+
   function markBlanks(root) {
     var columns = JSON.parse(root.getAttribute("data-columns"));
     Array.prototype.forEach.call(root.querySelectorAll("tbody tr"), function (tr) {
@@ -238,7 +250,13 @@
         var cell = cells[index];
         if (!cell) return;
         var input = cell.querySelector("[data-col]");
-        cell.classList.toggle("blank", !!(col.required && hasAny && input && !input.value.trim()));
+        var text = input ? input.value.trim() : "";
+        cell.classList.toggle("blank", !!(col.required && hasAny && !text));
+        // A value outside the pick list is marked, not refused: a house schema may add classes.
+        var options = col.suggest ? suggestionSet(root, col.suggest) : null;
+        var unknown = !!(options && options.size && text && !options.has(text.toLowerCase()));
+        cell.classList.toggle("unknown", unknown);
+        if (input) input.title = unknown ? (root.getAttribute("data-unknown-title") || "") : "";
       });
     });
   }
@@ -270,6 +288,7 @@
         input = document.createElement("input");
         input.type = col.type === "date" ? "date" : "text";
         input.placeholder = col.label;
+        if (col.suggest) input.setAttribute("list", "suggest-" + root.getAttribute("data-field") + "-" + col.suggest);
       }
       input.setAttribute("data-col", col.id);
       input.value = (values && values[col.id]) || "";

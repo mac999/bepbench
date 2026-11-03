@@ -92,7 +92,8 @@ def framework_detail(framework_id: str):
                         "required": f.required, "weight": f.weight, "help": f.help,
                         "options": f.options,
                         "columns": [{"id": c.id, "label": c.label, "type": c.type,
-                                     "required": c.required, "options": c.options}
+                                     "required": c.required, "options": c.options,
+                                     "suggest": c.suggest}
                                     for c in f.columns],
                     }
                     for f in s.fields
@@ -392,6 +393,24 @@ def model_buffer(slug: str, model_id: int):
         return _error(model.error or "this model has no viewer data; upload it again", 404)
     return send_file(model.buffer_path, mimetype="application/octet-stream",
                      max_age=0, conditional=True, etag=True)
+
+
+@api_bp.get("/ifc/classes")
+def ifc_classes():
+    """The IFC classes a LOIN row may name, each with the schemas that define it."""
+    from ..ids import IdsError, known_classes
+    from ..settings import get as setting
+
+    schemas = request.args.getlist("schema") or None
+    try:
+        classes = known_classes(schemas)
+    except IdsError as exc:
+        return jsonify({"error": str(exc)}), 400
+    return jsonify({
+        "root": setting("ids.class_root", "IfcProduct"),
+        "schemas": schemas or setting("ids.class_schemas", []),
+        "classes": classes,
+    })
 
 
 @api_bp.get("/settings/viewer")

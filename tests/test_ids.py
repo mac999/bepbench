@@ -112,3 +112,22 @@ def test_every_framework_with_a_loin_table_is_mapped():
         columns = {c.id for c in field.columns}
         for role, column in source.get("columns", {}).items():
             assert column in columns, f"{framework_id}: {role} -> {column}"
+
+
+def test_known_classes_say_which_schemas_define_them():
+    from bepkit.ids import known_classes
+
+    by_name = {c["name"]: c["schemas"] for c in known_classes()}
+    assert by_name["IfcWall"] == ["IFC2X3", "IFC4", "IFC4X3_ADD2"]
+    assert by_name["IfcCourse"] == ["IFC4X3_ADD2"]
+    assert "IfcProduct" not in by_name                      # abstract
+    assert [c["name"] for c in known_classes(["IFC2X3"])][:2] == ["IfcAnnotation", "IfcBeam"]
+
+
+def test_the_class_list_follows_the_settings():
+    from bepkit.ids import known_classes
+    from bepkit.settings import override
+
+    override("ids.class_root", "IfcWall")
+    names = [c["name"] for c in known_classes(["IFC4"])]
+    assert names == ["IfcWall", "IfcWallElementedCase", "IfcWallStandardCase"]

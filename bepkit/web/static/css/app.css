@@ -251,6 +251,7 @@ table.grid td input:focus, table.grid td select:focus {
   outline: 2px solid var(--accent); outline-offset: -2px; background: var(--surface-2);
 }
 table.grid td.blank input { background: color-mix(in srgb, var(--weak) 7%, transparent); }
+table.grid td.unknown input { box-shadow: inset 0 0 0 1px var(--weak); }
 td.rowtools { width: 34px; text-align: center; }
 .rowtools button {
   border: 0; background: transparent; color: var(--ink-3); cursor: pointer;

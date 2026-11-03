@@ -712,6 +712,29 @@ def ids_milestones(ctx: Context, slug: str, as_json: bool) -> None:
         click.echo(milestone)
 
 
+@ids_group.command("classes")
+@click.option("--schema", "schemas", multiple=True, metavar="SCHEMA",
+              help="Only the classes this schema defines, repeatable [ids.class_schemas].")
+@click.option("--json", "as_json", is_flag=True, help="Machine-readable output.")
+def ids_classes(schemas: tuple[str, ...], as_json: bool) -> None:
+    """List the IFC classes the level of information need table may name."""
+    from ..ids import IdsError, known_classes
+
+    try:
+        classes = known_classes(list(schemas) or None)
+    except IdsError as exc:
+        fail(str(exc))
+    if as_json:
+        click.echo(json.dumps(classes, indent=2))
+        return
+    if not classes:
+        click.secho("no schema data: install the ids extra", dim=True)
+        return
+    width = max(len(c["name"]) for c in classes)
+    for item in classes:
+        click.echo(f"{item['name']:<{width}}  {', '.join(item['schemas'])}")
+
+
 @ids_group.command("export")
 @click.argument("slug")
 @click.option("--out", "-o", type=click.Path(), help="Write to a file (a directory with --split).")

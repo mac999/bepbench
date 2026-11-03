@@ -58,7 +58,8 @@ def columns_json(columns: Any) -> Markup:
     """Serialise table columns for the JavaScript row builder."""
     payload = [
         {"id": c.id, "label": c.label, "type": c.type,
-         "required": c.required, "options": c.options, "width": c.width}
+         "required": c.required, "options": c.options, "width": c.width,
+         "suggest": c.suggest}
         for c in columns
     ]
     # Embedded in a single-quoted HTML attribute, so only quotes need escaping.
@@ -73,6 +74,30 @@ FILTERS = {
     "severity_label": severity_label,
 }
 
+def _ifc_classes() -> list[str]:
+    from ..ids import known_classes
+
+    return [c["name"] for c in known_classes()]
+
+
+# A column's `suggest:` names one of these; the editor offers it as a datalist.
+SUGGESTIONS = {
+    "ifc_classes": _ifc_classes,
+}
+
+
+def suggestions(name: str) -> list[str]:
+    """Values a column offers, or none when the source is unavailable."""
+    source = SUGGESTIONS.get(name)
+    if source is None:
+        return []
+    try:
+        return source()
+    except Exception:
+        return []
+
+
 GLOBALS = {
     "now": lambda: datetime.now(timezone.utc),
+    "suggestions": suggestions,
 }

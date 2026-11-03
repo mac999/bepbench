@@ -123,8 +123,10 @@ nothing, so it is reported as **N/A** and not counted as satisfied.
 
 A row that names no IFC class, or a class the target schema lacks, is **reported, never
 guessed** into a silent false positive; inference from the element name is a convenience and
-says so. Set the *IFC Class* column in the LOIN table to be certain, and write properties as
-`Pset_DoorCommon.FireRating` to require them in the set authoring tools actually use.
+says so. Set the *IFC Class* column in the LOIN table to be certain: the cell offers the
+schemas' own class list (`bep ids classes` prints it) and marks a name none of them defines.
+Write properties as `Pset_DoorCommon.FireRating` to require them in the set authoring tools
+actually use.
 How BEP, LOIN, IDS, IFC and MVD relate is in [docs/07-standards.md](docs/07-standards.md).
 
 ---
@@ -284,7 +286,7 @@ bepkit/
 
 ```bash
 pip install -e ".[dev]"
-pytest -q        # 198 tests
+pytest -q        # 202 tests
 ```
 
 Optional-dependency tests skip when the dependency is absent. No test needs a model server
@@ -299,6 +301,7 @@ BIMForum LOD Specification · buildingSMART IDS 1.0 · IFC2X3 / IFC4
 
 | Version | Date | Change |
 | --- | --- | --- |
+| 0.5.0 | 2026-11-04 | IFC Class column offers the schema class list; `bep ids classes` |
 | 0.4.3 | 2026-10-30 | Loading spinner clears once a model is shown |
 | 0.4.2 | 2026-10-29 | Requirements match IFC subtypes; bad input no longer crashes |
 | 0.4.1 | 2026-10-27 | Public demo app on Fly.io |

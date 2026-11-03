@@ -49,6 +49,8 @@ class Column:
     options: list[str] = field(default_factory=list)
     help: str = ""
     width: str = ""
+    # Name of a pick list the editor offers in this column; typing stays allowed.
+    suggest: str = ""
 
     @classmethod
     def from_dict(cls, raw: dict[str, Any]) -> "Column":
@@ -60,6 +62,7 @@ class Column:
             options=list(raw.get("options", [])),
             help=raw.get("help", ""),
             width=raw.get("width", ""),
+            suggest=raw.get("suggest", ""),
         )
 
 

@@ -94,6 +94,7 @@
         } else {
           input = document.createElement("input");
           input.type = col.type === "date" ? "date" : "text";
+          if (col.suggest) input.setAttribute("list", "suggest-" + table.getAttribute("data-field") + "-" + col.suggest);
         }
         input.setAttribute("data-col", col.id);
         input.value = row[col.id] || "";

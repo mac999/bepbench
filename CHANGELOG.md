@@ -3,6 +3,15 @@
 Versions follow semantic versioning: a minor number for new features, a patch number for
 fixes and documentation. Each version is tagged in git (`v0.4.0`).
 
+## 0.5.0 — 2026-11-04 — IFC class pick list
+
+- The *IFC Class* cell of the LOIN table offers every instantiable class the target schemas
+  define (`ids.class_root`, `ids.class_schemas`) and marks a typed name none of them
+  defines. Typing stays allowed. `GET /api/ifc/classes` and `bep ids classes` give the same
+  list with the schemas defining each class.
+- A framework column may name a pick list with `suggest:`; the editor renders it as a
+  datalist, so a house framework can offer its own lists.
+
 ## 0.4.3 — 2026-10-30 — Viewer spinner fix
 
 - The loading spinner over the 3D view clears once the model is shown. The overlay's own

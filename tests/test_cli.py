@@ -122,3 +122,12 @@ def test_word_alias_is_accepted(runner, tmp_path):
     target = tmp_path / "plan.docx"
     assert invoke(runner, "export", "bridge-12", "-f", "word", "-o", str(target)).exit_code == 0
     assert target.exists()
+
+
+def test_ids_classes_lists_each_class_with_its_schemas(runner):
+    pytest.importorskip("ifctester")
+    result = invoke(runner, "ids", "classes", "--schema", "IFC2X3", "--json")
+    names = [c["name"] for c in json.loads(result.output)]
+    assert "IfcWallStandardCase" in names and "IfcCourse" not in names
+    text = invoke(runner, "ids", "classes").output
+    assert "IfcCourse" in text and "IFC4X3_ADD2" in text

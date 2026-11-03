@@ -229,7 +229,7 @@ sections:
           - { id: element, label: Element / System, type: text, required: true }
           - { id: stage, label: Stage, type: text, required: true, width: "110px" }
           - { id: lod, label: Indicative LOD, type: select, options: ["100", "200", "300", "350", "400", "500"], width: "120px", help: "Drives the model viewer's detail filter." }
-          - { id: ifc_class, label: IFC Class, type: text, width: "150px", placeholder: "IfcWall", help: "Used to generate a buildingSMART IDS. Left blank, it is inferred from the element name." }
+          - { id: ifc_class, label: IFC Class, type: text, width: "150px", placeholder: "IfcWall", suggest: ifc_classes, help: "Used to generate a buildingSMART IDS. Pick from the list or type a class; left blank, it is inferred from the element name." }
           - { id: geometry, label: Geometrical Detail, type: text, required: true }
           - { id: alphanumeric, label: Alphanumeric Information, type: text, required: true }
           - { id: documentation, label: Documentation, type: text }

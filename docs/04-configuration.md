@@ -111,6 +111,7 @@ same name, on `bep ids export`, `bep ids check` and the HTTP API.
 | `ids.classification_split`, `ids.classification_max_length` | | How the classification system name is cut from the plan's text |
 | `ids.sources.<framework>` | | Which table holds the LOIN, its columns, and where the classification is |
 | `ids.class_hints` | | Words in an element name mapped to an IFC class when none is stated |
+| `ids.class_root`, `ids.class_schemas` | `bep ids classes --schema` | The pick list in the table's IFC Class column: every instantiable class under the root, in any listed schema |
 
 ## `cli`
 

@@ -21,8 +21,9 @@
 
   {% if field.type == 'table' %}
     <div class="tbl-wrap">
-      <table class="grid" data-table data-path="{{ path }}"
-             data-columns='{{ field.columns | columns_json }}'>
+      <table class="grid" data-table data-path="{{ path }}" data-field="{{ field.id }}"
+             data-columns='{{ field.columns | columns_json }}'
+             data-unknown-title="{{ t('editor.unknown_value') }}">
         <thead>
           <tr>
             {% for column in field.columns %}
@@ -46,7 +47,8 @@
                     </select>
                   {% else %}
                     <input data-col="{{ column.id }}" type="{{ 'date' if column.type == 'date' else 'text' }}"
-                           value="{{ row.get(column.id, '') }}" placeholder="{{ column.label }}">
+                           value="{{ row.get(column.id, '') }}" placeholder="{{ column.label }}"
+                           {% if column.suggest %}list="suggest-{{ field.id }}-{{ column.suggest }}"{% endif %}>
                   {% endif %}
                 </td>
               {% endfor %}
@@ -58,6 +60,11 @@
           {% endfor %}
         </tbody>
       </table>
+      {% for column in field.columns if column.suggest %}
+        <datalist id="suggest-{{ field.id }}-{{ column.suggest }}">
+          {% for option in suggestions(column.suggest) %}<option value="{{ option }}">{% endfor %}
+        </datalist>
+      {% endfor %}
     </div>
     <div class="tbl-foot">
       <button class="btn sm" type="button" data-add-row="{{ path }}">+ {{ t('editor.add_row') }}</button>

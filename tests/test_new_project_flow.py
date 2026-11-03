@@ -244,3 +244,20 @@ def test_the_hidden_attribute_wins_over_component_display(client):
     # .viewer-overlay sets display: grid; without this rule its spinner never hid.
     css = client.get("/static/css/app.css").get_data(as_text=True)
     assert "[hidden] { display: none !important; }" in css
+
+
+@needs_ifc
+def test_the_loin_table_offers_the_schema_class_list(client, project):
+    client.put(f"/api/projects/{project.slug}/values", json={"information_requirements.loin": LOIN[:1]})
+    page = client.get(f"/p/{project.slug}/s/information_requirements").get_data(as_text=True)
+    assert 'list="suggest-loin-ifc_classes"' in page
+    assert '<datalist id="suggest-loin-ifc_classes">' in page and 'value="IfcWall"' in page
+
+    body = client.get("/api/ifc/classes?schema=IFC2X3").get_json()
+    assert body["schemas"] == ["IFC2X3"]
+    assert {"name": "IfcWallStandardCase", "schemas": ["IFC2X3"]} in body["classes"]
+    assert client.get("/api/ifc/classes?schema=IFCX").status_code == 400
+
+    framework = client.get("/api/frameworks/iso19650").get_json()
+    loin = [f for s in framework["sections"] for f in s["fields"] if f["id"] == "loin"][0]
+    assert [c["suggest"] for c in loin["columns"] if c["id"] == "ifc_class"] == ["ifc_classes"]

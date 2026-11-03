@@ -139,8 +139,8 @@ to the front and puts the viewer's scaling work on hold.
 
 **Task 4 comes first.** Its first part is done: one IDS per milestone, every attached model
 checked in its own schema, classes checked against the target schema, subtypes covered, and
-real property sets. See [07-standards.md](07-standards.md). Next, in order: a class picker
-in the LOIN table, BCF reports from the check, bSDD URIs.
+real property sets, and a class pick list in the LOIN table (0.5.0). See
+[07-standards.md](07-standards.md). Next, in order: BCF reports from the check, bSDD URIs.
 
 **Tasks 6 → 1 → 2 → 3 wait for evidence.** They remain the right order if the
 20,000-element cap starts to bite, and the measurements above still hold. Spending the
