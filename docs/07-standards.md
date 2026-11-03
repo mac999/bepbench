@@ -70,6 +70,11 @@ class under `ids.class_root` in the schemas `ids.class_schemas` names, and marks
 of them defines. Typing stays allowed, since a house schema may add classes; `bep ids
 classes` prints the same list with the schemas defining each.
 
+**The classification system points at bSDD.** "Uniclass 2015" in the plan becomes the
+URI of that dictionary in the buildingSMART Data Dictionary on the classification facet, so
+a checker resolves one dictionary, not a name. `ids.bsdd_dictionaries` holds the map and
+`ids.bsdd_lookup` asks the bSDD API for the rest.
+
 **Failures leave as BCF, not as a report to retype.** A check's failures download as a
 BCF 2.1 file: one issue per failed specification, every failing element in its viewpoint,
 the requirement and the reasons in the description. Reviewers open it in the issue tool

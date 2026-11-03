@@ -365,7 +365,9 @@ sections:
         label: Classification System
         type: text
         required: true
+        suggest: classification_systems
         placeholder: "Uniclass 2015 — tables Ss, Pr, EF applied to all model objects"
+        help: "Start with the system's name; the IDS then points at its bSDD dictionary."
       - id: production_methods
         label: Information Production Methods and Procedures
         type: markdown

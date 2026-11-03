@@ -212,9 +212,9 @@ pytest -q                         # 198 tests
 - **Requirements tab** in the editor — 0.4.0.
 - **End-to-end pass from an empty database** — 0.4.2 found and fixed eight input-handling
   defects; 0.4.3 fixed the viewer spinner that never cleared.
+- **IFC class pick list, BCF issues, bSDD URIs** — 0.5.0 to 0.7.0, the rest of roadmap task 4.
 
 ## Not done
 
-- **bSDD URIs and BCF reports** — the next two IDS items on the roadmap.
 - **Performance regression tests** — prerequisite for the instancing and compression work,
   which waits for a model that hits the cap.

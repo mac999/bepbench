@@ -22,6 +22,7 @@ from typing import Any
 
 from ..scoring.rules import table_rows
 from ..settings import get as setting
+from .bsdd import classification_uri
 
 try:
     from ifctester import ids as ids_model
@@ -61,10 +62,14 @@ class BuildResult:
     milestone: str = ""
     default_pset_properties: int = 0
     default_pset: str = ""
+    classification: str = ""
+    classification_uri: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "specifications": self.specifications,
+            "classification": self.classification,
+            "classification_uri": self.classification_uri,
             "ifc_version": list(self.ifc_version),
             "milestone": self.milestone,
             "identifiers": list(self.identifiers),
@@ -335,8 +340,10 @@ def build(
     )
 
     classification = _classification_system(source, values)
+    dictionary_uri = classification_uri(classification) if classification else ""
     result = BuildResult(xml="", specifications=0, ifc_version=versions, milestone=milestone,
-                         default_pset=pset)
+                         default_pset=pset, classification=classification,
+                         classification_uri=dictionary_uri)
 
     for index, row in enumerate(rows, start=1):
         element = str(row.get(columns.get("element", "element"), "")).strip()
@@ -389,7 +396,7 @@ def build(
             ))
         if classification:
             spec.requirements.append(ids_model.Classification(
-                system=classification, cardinality="required",
+                system=classification, uri=dictionary_uri or None, cardinality="required",
                 instructions=f"Classified under {classification}.",
             ))
         for name in split_properties(alphanumeric):

@@ -131,3 +131,42 @@ def test_the_class_list_follows_the_settings():
     override("ids.class_root", "IfcWall")
     names = [c["name"] for c in known_classes(["IFC4"])]
     assert names == ["IfcWall", "IfcWallElementedCase", "IfcWallStandardCase"]
+
+
+WALL_ROW = {"element": "Walls", "ifc_class": "IfcWall", "stage": "3"}
+UNICLASS = "https://identifier.buildingsmart.org/uri/nbs/uniclass2015/1"
+
+
+def test_the_classification_facet_points_at_the_bsdd_dictionary():
+    from bepkit.ids import build
+
+    result = build(FakeProject(), _framework(), _values([WALL_ROW]))
+    assert (result.classification, result.classification_uri) == ("Uniclass 2015", UNICLASS)
+    assert f'uri="{UNICLASS}"' in result.xml
+
+    values = _values([WALL_ROW])
+    values["standards_methods"]["classification"] = "OmniClass tables 21 and 23"
+    result = build(FakeProject(), _framework(), values)
+    assert result.classification == "OmniClass tables 21 and 23" and result.classification_uri == ""
+    assert "identifier.buildingsmart.org" not in result.xml
+
+
+def test_bsdd_names_match_whole_words_offline_and_the_api_only_when_asked(monkeypatch):
+    from bepkit.ids import bsdd, classification_uri
+    from bepkit.settings import override
+
+    assert classification_uri("NBS Uniclass 2015 (tables Ss, Pr)") == UNICLASS
+    assert classification_uri("cci") == bsdd.dictionaries_offline()["CCI"]
+    assert classification_uri("") == ""
+
+    calls = []
+    monkeypatch.setattr(bsdd, "fetch_dictionaries", lambda *a, **k: calls.append(1) or [
+        {"name": "OmniClass", "version": "1", "uri": "https://x/omniclass", "latest": True}])
+    assert classification_uri("OmniClass tables 21") == "" and calls == []
+    override("ids.bsdd_lookup", True)
+    assert classification_uri("OmniClass tables 21") == "https://x/omniclass"
+
+    def offline(*a, **k):
+        raise OSError("no network")
+    monkeypatch.setattr(bsdd, "fetch_dictionaries", offline)
+    assert classification_uri("MasterFormat", lookup=True) == ""

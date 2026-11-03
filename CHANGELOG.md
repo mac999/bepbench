@@ -3,6 +3,15 @@
 Versions follow semantic versioning: a minor number for new features, a patch number for
 fixes and documentation. Each version is tagged in git (`v0.4.0`).
 
+## 0.7.0 — 2026-11-04 — bSDD dictionary URIs
+
+- The classification facet carries the bSDD URI of the system the plan names, resolved from
+  `ids.bsdd_dictionaries` (Uniclass 2015, CCI, NL-SfB, ETIM, IFC out of the box) or, with
+  `ids.bsdd_lookup`, from the bSDD API. The *Requirements* tab and `bep ids export` say
+  which dictionary was matched; `bep ids bsdd <name>` resolves a name on its own.
+- The *Classification System* field offers the configured names; a framework field may
+  name a pick list with `suggest:`, as a table column can since 0.5.0.
+
 ## 0.6.0 — 2026-11-04 — BCF issues from a check
 
 - A model's failures against the plan's requirements download as a BCF 2.1 file, one

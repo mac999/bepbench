@@ -342,6 +342,8 @@ sections:
         label: Classification System
         type: text
         required: true
+        suggest: classification_systems
+        help: "Start with the system's name; the IDS then points at its bSDD dictionary."
 
   - id: risk_register
     title: Information Management Risk Register

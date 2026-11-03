@@ -90,7 +90,7 @@ does it, and the README lists it fifth. Repositioning from "another BEP authorin
 
 Worth building on top:
 
-- **bSDD integration** — resolve the classification system to a URI instead of free text
+- **bSDD integration** — done in 0.7.0: the classification system resolves to its dictionary URI
 - **IDS → BCF reports** — done in 0.6.0: the failures land in the tools people already review issues in
 - **Better IFC class resolution** — the current keyword inference is honest about being a
   guess, but the fewer guesses the better
@@ -140,8 +140,9 @@ to the front and puts the viewer's scaling work on hold.
 **Task 4 comes first.** Its first part is done: one IDS per milestone, every attached model
 checked in its own schema, classes checked against the target schema, subtypes covered, and
 real property sets, and a class pick list in the LOIN table (0.5.0). See
-[07-standards.md](07-standards.md), and the check's failures leave as BCF issues (0.6.0).
-Next: bSDD URIs.
+[07-standards.md](07-standards.md); the check's failures leave as BCF issues (0.6.0) and
+the classification facet points at bSDD (0.7.0). What follows is the read-only share link
+from task 5, then 6 → 1 → 2 → 3 when a model hits the cap.
 
 **Tasks 6 → 1 → 2 → 3 wait for evidence.** They remain the right order if the
 20,000-element cap starts to bite, and the measurements above still hold. Spending the

@@ -673,6 +673,14 @@ def _ids_options(func):
 
 def _echo_build_notes(build: dict[str, Any], indent: str = "  ") -> None:
     """The same notices for an export and a check, so neither hides a skipped row."""
+    if build.get("classification"):
+        if build.get("classification_uri"):
+            click.secho(f"{indent}classification {build['classification']} → "
+                        f"{build['classification_uri']}", dim=True)
+        else:
+            click.secho(f"{indent}classification {build['classification']}: no bSDD dictionary "
+                        "matched; add it to ids.bsdd_dictionaries or set ids.bsdd_lookup=true",
+                        fg="yellow")
     for item in build.get("inferred", []):
         click.secho(f"{indent}row {item['row']}: {item['element']} — {item['reason']}", fg="yellow")
     for item in build.get("narrowed", []):
@@ -733,6 +741,21 @@ def ids_classes(schemas: tuple[str, ...], as_json: bool) -> None:
     width = max(len(c["name"]) for c in classes)
     for item in classes:
         click.echo(f"{item['name']:<{width}}  {', '.join(item['schemas'])}")
+
+
+@ids_group.command("bsdd")
+@click.argument("system")
+@click.option("--lookup/--no-lookup", default=None,
+              help="Ask the bSDD API when the configured map has no match [ids.bsdd_lookup].")
+def ids_bsdd(system: str, lookup: bool | None) -> None:
+    """Resolve a classification system's name to its bSDD dictionary URI."""
+    from ..ids import classification_uri
+
+    uri = classification_uri(system, lookup=lookup)
+    if not uri:
+        fail(f"no bSDD dictionary matches '{system}'; add it to ids.bsdd_dictionaries"
+             + ("" if lookup else " or try --lookup"))
+    click.echo(uri)
 
 
 @ids_group.command("export")

@@ -110,7 +110,13 @@
   {% else %}
     <input class="input" id="in-{{ field.id }}" name="f_{{ field.id }}" data-path="{{ path }}"
            type="{{ 'date' if field.type == 'date' else ('number' if field.type == 'number' else 'text') }}"
-           value="{{ value if value is not none else '' }}" placeholder="{{ field.placeholder }}">
+           value="{{ value if value is not none else '' }}" placeholder="{{ field.placeholder }}"
+           {% if field.suggest %}list="suggest-{{ field.id }}-{{ field.suggest }}"{% endif %}>
+    {% if field.suggest %}
+      <datalist id="suggest-{{ field.id }}-{{ field.suggest }}">
+        {% for option in suggestions(field.suggest) %}<option value="{{ option }}">{% endfor %}
+      </datalist>
+    {% endif %}
   {% endif %}
 
   {% if field.example %}

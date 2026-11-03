@@ -80,9 +80,16 @@ def _ifc_classes() -> list[str]:
     return [c["name"] for c in known_classes()]
 
 
-# A column's `suggest:` names one of these; the editor offers it as a datalist.
+def _classification_systems() -> list[str]:
+    from ..ids import dictionaries_offline
+
+    return list(dictionaries_offline())
+
+
+# A field's or column's `suggest:` names one of these; the editor offers it as a datalist.
 SUGGESTIONS = {
     "ifc_classes": _ifc_classes,
+    "classification_systems": _classification_systems,
 }
 
 

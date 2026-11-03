@@ -111,6 +111,8 @@ same name, on `bep ids export`, `bep ids check` and the HTTP API.
 | `ids.bcf_filename`, `ids.bcf_topic_per`, `ids.bcf_max_topics` | `--bcf` | BCF file name; one issue per `specification` or per `element`; cap on issues |
 | `ids.bcf_topic_type`, `ids.bcf_topic_status`, `ids.bcf_author`, `ids.bcf_title_format`, `ids.bcf_element_title_format` | | What each BCF issue carries |
 | `ids.classification_split`, `ids.classification_max_length` | | How the classification system name is cut from the plan's text |
+| `ids.bsdd_dictionaries` | `bep ids bsdd` | System name → bSDD dictionary URI, matched offline; also the Classification System field's pick list |
+| `ids.bsdd_lookup`, `ids.bsdd_api`, `ids.bsdd_timeout` | `--lookup` | Ask the bSDD API for a name the map lacks |
 | `ids.sources.<framework>` | | Which table holds the LOIN, its columns, and where the classification is |
 | `ids.class_hints` | | Words in an element name mapped to an IFC class when none is stated |
 | `ids.class_root`, `ids.class_schemas` | `bep ids classes --schema` | The pick list in the table's IFC Class column: every instantiable class under the root, in any listed schema |

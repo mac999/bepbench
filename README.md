@@ -119,7 +119,9 @@ rows only. A plan has a model per discipline, so the check covers each one. In t
 the *Requirements* tab beside *Properties* and *Assessment* does the same: pick a milestone,
 download its IDS, and check every attached model, each reported on its own. A model that
 fails something offers its failures as a **BCF** file, so they open as issues in Revit,
-BIMcollab, Solibri or any other tool that reads BCF 2.1.
+BIMcollab, Solibri or any other tool that reads BCF 2.1. The classification system the plan
+names is resolved to its bSDD dictionary URI, so the IDS points at one dictionary rather than
+at a free-text name.
 
 A specification with nothing in the model to apply to passes in IDS terms but has checked
 nothing, so it is reported as **N/A** and not counted as satisfied.
@@ -289,7 +291,7 @@ bepkit/
 
 ```bash
 pip install -e ".[dev]"
-pytest -q        # 206 tests
+pytest -q        # 210 tests
 ```
 
 Optional-dependency tests skip when the dependency is absent. No test needs a model server
@@ -304,6 +306,7 @@ BIMForum LOD Specification · buildingSMART IDS 1.0 · IFC2X3 / IFC4
 
 | Version | Date | Change |
 | --- | --- | --- |
+| 0.7.0 | 2026-11-04 | Classification facet points at its bSDD dictionary |
 | 0.6.0 | 2026-11-04 | Check failures download as BCF 2.1 issues |
 | 0.5.0 | 2026-11-04 | IFC Class column offers the schema class list; `bep ids classes` |
 | 0.4.3 | 2026-10-30 | Loading spinner clears once a model is shown |

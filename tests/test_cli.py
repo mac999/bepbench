@@ -131,3 +131,9 @@ def test_ids_classes_lists_each_class_with_its_schemas(runner):
     assert "IfcWallStandardCase" in names and "IfcCourse" not in names
     text = invoke(runner, "ids", "classes").output
     assert "IfcCourse" in text and "IFC4X3_ADD2" in text
+
+
+def test_ids_bsdd_resolves_a_system_name(runner):
+    assert invoke(runner, "ids", "bsdd", "Uniclass 2015").output.strip().endswith("/nbs/uniclass2015/1")
+    missing = runner[0].invoke(runner[1], ["ids", "bsdd", "OmniClass", "--no-lookup"])
+    assert missing.exit_code != 0 and "ids.bsdd_dictionaries" in missing.output

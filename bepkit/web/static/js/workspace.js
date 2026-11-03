@@ -710,6 +710,14 @@
         var b = result.body, html = [];
         summary.textContent = fmt(s("req_summary", "{count} specifications · for {versions}"),
           { count: b.specifications, versions: (b.ifc_version || []).join(", ") });
+        if (b.classification) {
+          // Not an issueRow: the detail is a link to the dictionary, not text.
+          html.push('<div class="issue" data-sev="' + (b.classification_uri ? "info" : "minor") + '"><span class="sev"></span><div>' +
+            esc(fmt(s("req_classification", "Classification: {system}"), { system: b.classification })) +
+            '<div class="detail">' + (b.classification_uri
+              ? '<a href="' + esc(b.classification_uri) + '" target="_blank" rel="noopener">' + esc(s("req_bsdd", "in bSDD")) + "</a>"
+              : esc(s("req_bsdd_missing", "no bSDD dictionary matched"))) + "</div></div></div>");
+        }
         (b.skipped || []).forEach(function (i) {
           html.push(issueRow("major", rowLabel(i.row) + " " + i.element, i.reason + " — " + s("req_skipped", "not exported")));
         });

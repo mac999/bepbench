@@ -109,6 +109,8 @@ class Field:
     quality: Quality = field(default_factory=Quality)
     # Which appointment stages ask for this field. Empty means every stage.
     stages: tuple[str, ...] = ()
+    # Name of a pick list the editor offers for a text field; typing stays allowed.
+    suggest: str = ""
 
     @classmethod
     def from_dict(cls, raw: dict[str, Any]) -> "Field":
@@ -129,6 +131,7 @@ class Field:
             columns=[Column.from_dict(c) for c in raw.get("columns", [])],
             quality=Quality.from_dict(raw.get("quality", {})),
             stages=_stages(raw.get("stages")),
+            suggest=raw.get("suggest", ""),
         )
 
     @property

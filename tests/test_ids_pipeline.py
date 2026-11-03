@@ -402,3 +402,14 @@ def test_cli_check_writes_a_bcf_per_failing_model(cli, tmp_path):
     cli("set", "duplex", "information_requirements.loin", json.dumps([DOOR]))
     clean = cli("ids", "check", "duplex", str(DUPLEX), "--bcf", str(tmp_path / "clean"))
     assert "no BCF was written" in clean.output and not list((tmp_path / "clean").glob("*.bcf"))
+
+
+def test_the_report_and_the_editor_carry_the_bsdd_dictionary(client, plan):
+    client.put(f"/api/projects/{plan.slug}/values",
+               json={"standards_methods.classification": "Uniclass 2015 — tables Ss, Pr"})
+    report = client.get(f"/api/projects/{plan.slug}/ids?report=1").get_json()
+    assert report["classification_uri"].endswith("/nbs/uniclass2015/1")
+
+    page = client.get(f"/p/{plan.slug}/s/standards_methods").get_data(as_text=True)
+    assert 'list="suggest-classification-classification_systems"' in page
+    assert 'value="Uniclass 2015"' in page and 'value="CCI Construction"' in page

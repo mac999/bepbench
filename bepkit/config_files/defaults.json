@@ -300,6 +300,19 @@
     "document_version": "1.0",
     "classification_split": "[—–\\-,(]",
     "classification_max_length": 60,
+    "bsdd_dictionaries": {
+      "Uniclass 2015": "https://identifier.buildingsmart.org/uri/nbs/uniclass2015/1",
+      "Uniclass": "https://identifier.buildingsmart.org/uri/nbs/uniclass2015/1",
+      "CCI Construction": "https://identifier.buildingsmart.org/uri/molio/cciconstruction/1.0",
+      "CCI": "https://identifier.buildingsmart.org/uri/molio/cciconstruction/1.0",
+      "NL-SfB": "https://identifier.buildingsmart.org/uri/nlsfb/nlsfb2005/2.2",
+      "ETIM": "https://identifier.buildingsmart.org/uri/etim/etim/10.1",
+      "IFC": "https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3"
+    },
+    "bsdd_lookup": false,
+    "bsdd_api": "https://api.bsdd.buildingsmart.org/api/Dictionary/v1",
+    "bsdd_timeout": 5,
+    "_bsdd_comment": "The classification facet carries the bSDD URI of the system the plan names. bsdd_dictionaries answers offline, matched on the name the plan's text starts with (exact, else the longest name it contains); the same names are offered in the Classification System field. bsdd_lookup true asks the bSDD API for a name the map lacks, bsdd_timeout seconds at most.",
     "author_domain": "example.com",
     "sources": {
       "iso19650": {

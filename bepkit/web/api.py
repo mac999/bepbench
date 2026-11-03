@@ -90,7 +90,7 @@ def framework_detail(framework_id: str):
                     {
                         "id": f.id, "label": f.label, "type": f.type,
                         "required": f.required, "weight": f.weight, "help": f.help,
-                        "options": f.options,
+                        "options": f.options, "suggest": f.suggest,
                         "columns": [{"id": c.id, "label": c.label, "type": c.type,
                                      "required": c.required, "options": c.options,
                                      "suggest": c.suggest}
