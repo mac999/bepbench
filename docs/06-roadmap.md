@@ -1,7 +1,7 @@
 # Roadmap
 
 Priorities by value for effort, differentiation and measured performance, as of
-September 2026. Every number below was measured on this machine against the bundled
+November 2026. Every number below was measured on this machine against the bundled
 Duplex model, not estimated from intuition.
 
 ## Where the project actually stands
@@ -138,8 +138,9 @@ to the front and puts the viewer's scaling work on hold.
 ```
 
 **Task 4 comes first.** Its first part is done: one IDS per milestone, every attached model
-checked in its own schema, classes checked against the target schema, and real property
-sets. See [07-standards.md](07-standards.md). bSDD URIs and BCF reports are next.
+checked in its own schema, classes checked against the target schema, subtypes covered, and
+real property sets. See [07-standards.md](07-standards.md). Next, in order: a class picker
+in the LOIN table, BCF reports from the check, bSDD URIs.
 
 **Tasks 6 → 1 → 2 → 3 wait for evidence.** They remain the right order if the
 20,000-element cap starts to bite, and the measurements above still hold. Spending the
@@ -156,8 +157,9 @@ Stated plainly so they are not rediscovered as surprises:
 - **The score is our own rubric**, not an industry-recognised measure. It grades whether
   commitments are stated, specific and internally consistent — never whether a commitment
   is *right* for the project. See [03-scoring.md](03-scoring.md).
-- **Element-to-requirement matching is string-based.** It reads well in a demo and is not
-  an audit. IDS export (task 4) is the path to real verification.
+- **Classes are inferred from element names** when a LOIN row does not name one. The
+  inference is reported, but a wrong guess checks the wrong elements; a class picker in
+  the table (task 4) removes the guess.
 - **SQLite assumes one writer.** Fine for a single information manager; see task 5.
 - **No version diff of attached models**, only of the plan text.
 

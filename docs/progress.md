@@ -1,6 +1,6 @@
 # Progress
 
-State of BEP Bench as of 26 September 2026. What exists, what was measured, what is
+State of BEP Bench as of 4 November 2026. What exists, what was measured, what is
 known to be missing. Next steps live in [06-roadmap.md](06-roadmap.md).
 
 Repository: <https://github.com/mac999/bepbench>
@@ -11,14 +11,14 @@ Repository: <https://github.com/mac999/bepbench>
 
 | | |
 | --- | --- |
-| Commits | 5 (`88c2336` … `a81c7d5`) |
-| Tests | **126**, all passing |
-| Python | 8,183 lines (`bepkit/` + `tests/`) |
-| Templates | 1,251 lines |
-| CSS + JS | 2,530 lines (excluding vendored three.js) |
-| Frameworks | 1,864 lines of YAML |
-| Documentation | 956 lines |
-| Deployed | No — Fly config present, never launched |
+| Commits | 23 (`88c2336` … `b24481a`), tagged v0.1.0 – v0.4.3 |
+| Tests | **198**, all passing |
+| Python | 9,651 lines (`bepkit/` + `tests/`) |
+| Templates | 1,312 lines |
+| CSS + JS | 2,137 lines (excluding vendored three.js) |
+| Frameworks | 1,452 lines of YAML |
+| Documentation | 1,484 lines |
+| Deployed | <https://bepbench.fly.dev/> on Fly.io (Tokyo), sample plan and model loaded |
 
 ---
 
@@ -68,13 +68,16 @@ a delivery BEP — the honest reading of both.
 
 ### buildingSMART IDS
 
-The LOIN table exports as an XSD-valid IDS 1.0 document, and an attached model can be
-validated against the plan's own requirements. Rows naming no IFC class are reported,
-never guessed into a silent false positive.
+The LOIN table exports as an XSD-valid IDS 1.0 document, one per milestone, and every
+attached model is checked against the plan's own requirements in its own IFC schema. A
+requirement on a class also covers its instantiable subtypes, so `IfcWall` matches the
+`IfcWallStandardCase` elements an IFC2X3 export is made of. Rows naming no IFC class are
+reported, never guessed into a silent false positive; a class the target schema lacks is
+listed as skipped. The *Requirements* tab in the editor does the same with a click.
 
 ```
-bep ids export <plan> -o plan.ids
-bep ids check  <plan> model.ifc --fail-on-error
+bep ids export <plan> --milestone 3 -o plan.ids
+bep ids check  <plan> --fail-on-error
 ```
 
 ### Version comparison
@@ -171,22 +174,24 @@ Stated plainly so they are not rediscovered as surprises.
 - **The score is our own rubric**, not an industry-recognised measure. It grades whether
   commitments are stated, specific and internally consistent — never whether a commitment
   is *right* for the project. See [03-scoring.md](03-scoring.md).
-- **Element-to-requirement matching is string-based.** It reads well in a demo and is not
-  an audit. IDS export is the path to real verification.
+- **Classes are inferred from element names** when the LOIN row does not name one. The
+  inference is reported, but a wrong guess checks the wrong elements.
 - **The viewer caps at 20,000 elements** and even that is impractical: 131 MB of payload
-  and 20,000 draw calls. This is the top item on the roadmap.
+  and 20,000 draw calls. On hold until a user brings such a model.
 - **SQLite assumes one writer.** Fine for a single information manager; multi-user
   authoring, permissions and approval do not exist.
 - **No diff of attached models**, only of the plan text.
 - **No pre/post-appointment split in NBIMS-US or Lite** — only the ISO framework is
   stage-aware.
+- **The public demo runs no language model**, so AI drafting is off there.
 
 ---
 
 ## Environment
 
 - Data directory: `~/.local/share/bep` (SQLite + uploaded models)
-- Local server: gunicorn on `0.0.0.0:8080`, 1 worker / 8 threads
+- Local server: `bep serve` (Flask) or gunicorn on `0.0.0.0:8080`, 1 worker / 8 threads
+- Public demo: Fly.io app `bepbench`, region `nrt`, SQLite on a 1 GB volume
 - AI: Ollama `qwen3:30b-instruct` on `localhost:11434`
 - Demo plan: `riverside-interchange-phase-2`, ISO 19650-2, with `Duplex_A.ifc` attached
 
@@ -194,13 +199,22 @@ Stated plainly so they are not rediscovered as surprises.
 bep demo                          # worked example, ~87/100
 bep ifc import <plan> docs/demo/Duplex_A.ifc
 bep serve                         # http://127.0.0.1:8080
-pytest -q                         # 167 tests
+pytest -q                         # 198 tests
 ```
 
 ---
 
+## Done since the first record
+
+- **Fly.io deployment** — live at <https://bepbench.fly.dev/> since 0.4.1.
+- **IDS by milestone, every model checked, subtypes covered** — 0.3.0 to 0.4.2; see
+  [07-standards.md](07-standards.md).
+- **Requirements tab** in the editor — 0.4.0.
+- **End-to-end pass from an empty database** — 0.4.2 found and fixed eight input-handling
+  defects; 0.4.3 fixed the viewer spinner that never cleared.
+
 ## Not done
 
-- **Fly.io deployment** — config is written and never launched, by request
-- **The roadmap's task 0** (performance regression tests) — prerequisite for the
-  instancing and compression work that follows it
+- **bSDD URIs and BCF reports** — the next two IDS items on the roadmap.
+- **Performance regression tests** — prerequisite for the instancing and compression work,
+  which waits for a model that hits the cap.
