@@ -3,6 +3,11 @@
 Versions follow semantic versioning: a minor number for new features, a patch number for
 fixes and documentation. Each version is tagged in git (`v0.4.0`).
 
+## 0.7.2 — 2026-11-08 — Remove model from the viewer toolbar
+
+- *Remove model* sits next to *Upload IFC* in the viewer toolbar and acts on the shown
+  model, instead of a × on each row of the model list.
+
 ## 0.7.1 — 2026-11-04 — Property data types from the Pset template
 
 - A property facet requires the data type its standard property set template defines, so

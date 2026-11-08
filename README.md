@@ -306,6 +306,7 @@ BIMForum LOD Specification · buildingSMART IDS 1.0 · IFC2X3 / IFC4
 
 | Version | Date | Change |
 | --- | --- | --- |
+| 0.7.2 | 2026-11-08 | Remove model moves next to Upload IFC |
 | 0.7.1 | 2026-11-04 | Property data types follow the standard Pset template |
 | 0.7.0 | 2026-11-04 | Classification facet points at its bSDD dictionary |
 | 0.6.0 | 2026-11-04 | Check failures download as BCF 2.1 issues |

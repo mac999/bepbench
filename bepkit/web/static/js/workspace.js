@@ -183,6 +183,7 @@
 
     var fileInput = document.querySelector("[data-viewer-file]");
     document.querySelector("[data-viewer-upload]").addEventListener("click", function () { fileInput.click(); });
+    document.querySelector("[data-viewer-remove]").addEventListener("click", removeActiveModel);
     fileInput.addEventListener("change", function () {
       if (fileInput.files && fileInput.files[0]) upload(fileInput.files[0]);
     });
@@ -280,29 +281,33 @@
         '<div class="nm">' + esc(model.filename) + "</div>",
         '<div class="muted" style="font-size:11px">' + meta + "</div>",
         "</div>",
-        '<button class="btn ghost sm" data-model-delete="' + model.id + '" title="' +
-          esc(s("viewer_delete", "Remove")) + '">&times;</button>',
         "</div>"
       ].join("");
     }).join("");
 
     markModelRows();
     host.querySelectorAll("[data-model-row]").forEach(function (row) {
-      row.addEventListener("click", function (event) {
-        if (event.target.closest("[data-model-delete]")) return;
+      row.addEventListener("click", function () {
         var id = parseInt(row.getAttribute("data-model-row"), 10);
         loadModel(models.filter(function (m) { return m.id === id; })[0]);
       });
     });
-    host.querySelectorAll("[data-model-delete]").forEach(function (button) {
-      button.addEventListener("click", function () {
-        var id = button.getAttribute("data-model-delete");
-        fetch(api("/models/" + id), { method: "DELETE" }).then(function () {
-          if (viewer) viewer.clear();
-          activeModel = null;
-          refreshModels();
-        });
-      });
+    showRemoveButton();
+  }
+
+  function showRemoveButton() {
+    var button = document.querySelector("[data-viewer-remove]");
+    if (button) button.hidden = !activeModel;
+  }
+
+  function removeActiveModel() {
+    if (!activeModel) return;
+    fetch(api("/models/" + activeModel.id), { method: "DELETE" }).then(function () {
+      if (viewer) viewer.clear();
+      activeModel = null;
+      renderTree(null);
+      showRemoveButton();
+      refreshModels();
     });
   }
 
@@ -313,6 +318,7 @@
       return ensureViewer().then(function () { return loadModel(model); }, viewerMissing);
     }
     activeModel = model;
+    showRemoveButton();
     document.querySelectorAll("[data-model-row]").forEach(function (row) {
       row.classList.toggle("on", parseInt(row.getAttribute("data-model-row"), 10) === model.id);
     });
@@ -620,13 +626,7 @@
       toggle.checked = !toggle.checked;
       toggle.dispatchEvent(new Event("change"));
     } else if (action === "remove-model") {
-      if (!activeModel) return;
-      fetch(api("/models/" + activeModel.id), { method: "DELETE" }).then(function () {
-        if (viewer) viewer.clear();
-        activeModel = null;
-        renderTree(null);
-        refreshModels();
-      });
+      removeActiveModel();
     } else if (action === "ids-check") {
       if (!req) return;
       openRequirements();

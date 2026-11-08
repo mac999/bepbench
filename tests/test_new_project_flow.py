@@ -261,3 +261,10 @@ def test_the_loin_table_offers_the_schema_class_list(client, project):
     framework = client.get("/api/frameworks/iso19650").get_json()
     loin = [f for s in framework["sections"] for f in s["fields"] if f["id"] == "loin"][0]
     assert [c["suggest"] for c in loin["columns"] if c["id"] == "ifc_class"] == ["ifc_classes"]
+
+
+def test_the_viewer_toolbar_owns_the_model_remove_control(client, project):
+    page = client.get(f"/p/{project.slug}/s/project_information").get_data(as_text=True)
+    assert "data-viewer-upload" in page and "data-viewer-remove" in page
+    js = client.get("/static/js/workspace.js").get_data(as_text=True)
+    assert "data-model-delete" not in js and "removeActiveModel" in js
