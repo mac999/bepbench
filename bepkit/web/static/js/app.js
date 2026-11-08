@@ -60,12 +60,13 @@
   // Translated by the server so the rail keeps the reader's language after a save.
   var strings = JSON.parse(editor.getAttribute("data-strings") || "{}");
   function s(key, fallback) { return strings[key] || fallback; }
-  var saveState = document.querySelector("[data-save-state]");
   var pending = {};
   var timer = null;
   var inFlight = false;
 
   function setSaveState(state, text) {
+    // The indicator lives in the form, which a section change replaces.
+    var saveState = document.querySelector("[data-save-state]");
     if (!saveState) return;
     saveState.setAttribute("data-state", state);
     saveState.querySelector(".text").textContent = text;
@@ -80,11 +81,11 @@
   }
 
   function flush() {
-    if (inFlight || !Object.keys(pending).length) return;
+    if (inFlight || !Object.keys(pending).length) return Promise.resolve();
     var payload = pending;
     pending = {};
     inFlight = true;
-    fetch("/api/projects/" + encodeURIComponent(slug) + "/values", {
+    return fetch("/api/projects/" + encodeURIComponent(slug) + "/values", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ values: payload })
@@ -99,7 +100,7 @@
         repaint(result.body);
         setSaveState("saved", s("saved", "Saved") + " · " +
           new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
-        if (Object.keys(pending).length) flush();
+        if (Object.keys(pending).length) return flush();
       })
       .catch(function () {
         inFlight = false;
@@ -302,7 +303,8 @@
     return tr;
   }
 
-  document.querySelectorAll("[data-table]").forEach(function (root) {
+  function wireTables(scope) {
+    scope.querySelectorAll("[data-table]").forEach(function (root) {
     markBlanks(root);
     root.addEventListener("input", function () { syncTable(root); });
     root.addEventListener("change", function () { syncTable(root); });
@@ -326,7 +328,9 @@
         row.querySelector("[data-col]").focus();
       }
     });
-  });
+    });
+  }
+  wireTables(editor);
 
   document.addEventListener("click", function (event) {
     var add = event.target.closest("[data-add-row]");
@@ -349,9 +353,74 @@
     }
     if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       var next = document.querySelector("[data-next-section]");
-      if (next) { flush(); window.location.href = next.href; }
+      if (next) loadSection(next.href, true);
     }
   });
+
+  /* ---------------- section navigation ----------------
+     A section link swaps the form and the assessment tab in place instead of
+     reloading the page, so the viewer, the object tree, the selection and the
+     camera survive the move. The URL and history still change as before. */
+  var sectionPath = new RegExp("^/p/" + encodeURIComponent(slug).replace(/[.*+?^${}()|[\]\\]/g, "\\$&") +
+    "/s/([^/?#]+)/?$");
+  function sectionOf(url) {
+    var match = url.pathname.match(sectionPath);
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+
+  function loadSection(href, push) {
+    var url = new URL(href, window.location.href);
+    var target = sectionOf(url);
+    if (!target) { window.location.href = href; return Promise.resolve(); }
+    clearTimeout(timer);
+    return Promise.resolve(flush()).then(function () {
+      return fetch(url.pathname + "?partial=1", { headers: { Accept: "application/json" } });
+    }).then(function (res) {
+      if (!res.ok) throw new Error("section " + res.status);
+      return res.json();
+    }).then(function (data) {
+      var main = document.querySelector("main.pane-bep");
+      main.innerHTML = data.form_html;
+      var assessment = document.querySelector('[data-tab-panel="assessment"]');
+      if (assessment) assessment.innerHTML = data.assessment_html;
+      sectionId = data.section;
+      editor.setAttribute("data-section", data.section);
+      editor.setAttribute("data-lod-field", data.lod_field || "");
+      editor.setAttribute("data-lod-column", data.lod_column || "");
+      document.title = data.title;
+      document.querySelectorAll(".nav-item").forEach(function (item) {
+        item.classList.toggle("active", sectionOf(new URL(item.href, window.location.href)) === data.section);
+      });
+      suggestionSets = {};
+      wireTables(main);
+      if (push) history.pushState({ section: data.section }, "", url.pathname + url.hash);
+      var anchor = url.hash ? document.getElementById(url.hash.slice(1)) : null;
+      if (anchor) anchor.scrollIntoView({ block: "start" });
+      else main.scrollTop = 0, window.scrollTo(0, 0);
+      editor.dispatchEvent(new CustomEvent("bep:section", { detail: { section: data.section }, bubbles: true }));
+    }).catch(function () {
+      window.location.href = href;
+    });
+  }
+
+  document.addEventListener("click", function (event) {
+    if (event.defaultPrevented || event.button !== 0) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    var link = event.target.closest("a[href]");
+    if (!link || link.target || link.hasAttribute("download")) return;
+    var url = new URL(link.href, window.location.href);
+    if (url.origin !== window.location.origin || !sectionOf(url)) return;
+    event.preventDefault();
+    if (sectionOf(url) === sectionId && !url.hash) return;
+    loadSection(link.href, true);
+  });
+
+  window.addEventListener("popstate", function () {
+    if (sectionOf(window.location) && sectionOf(window.location) !== sectionId) {
+      loadSection(window.location.href, false);
+    }
+  });
+  history.replaceState({ section: sectionId }, "", window.location.href);
 
   window.addEventListener("beforeunload", function (event) {
     if (Object.keys(pending).length || inFlight) {

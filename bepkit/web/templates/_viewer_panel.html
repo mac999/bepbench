@@ -41,3 +41,13 @@
 
   <div data-viewer-models></div>
 </div>
+
+<dialog class="dialog" data-confirm-dialog>
+  <h2>{{ t('viewer.delete') }}</h2>
+  <p style="margin:0 0 6px">{{ t('viewer.delete_confirm') }}</p>
+  <p class="muted" style="margin:0 0 18px;font-size:12.5px;word-break:break-all" data-confirm-name></p>
+  <form method="dialog" class="row" style="justify-content:flex-end;gap:8px">
+    <button class="btn sm" value="cancel">{{ t('common.cancel') }}</button>
+    <button class="btn danger sm" value="confirm" data-confirm-ok>{{ t('viewer.delete') }}</button>
+  </form>
+</dialog>

@@ -300,15 +300,35 @@
     if (button) button.hidden = !activeModel;
   }
 
+  // The app's own dialog, so the question reads like the rest of the screen.
+  function confirmRemoval(filename) {
+    var dialog = document.querySelector("[data-confirm-dialog]");
+    if (!dialog || typeof dialog.showModal !== "function") {
+      return Promise.resolve(window.confirm(s("viewer_delete_confirm", "Remove this model?") + "\n" + filename));
+    }
+    return new Promise(function (resolve) {
+      dialog.querySelector("[data-confirm-name]").textContent = filename;
+      dialog.addEventListener("close", function onClose() {
+        dialog.removeEventListener("close", onClose);
+        resolve(dialog.returnValue === "confirm");
+      });
+      dialog.showModal();
+      dialog.querySelector("[data-confirm-ok]").focus();
+    });
+  }
+
   function removeActiveModel() {
     if (!activeModel) return;
-    if (!window.confirm(s("viewer_delete_confirm", "Remove this model?") + "\n" + activeModel.filename)) return;
-    fetch(api("/models/" + activeModel.id), { method: "DELETE" }).then(function () {
-      if (viewer) viewer.clear();
-      activeModel = null;
-      renderTree(null);
-      showRemoveButton();
-      refreshModels();
+    var model = activeModel;
+    confirmRemoval(model.filename).then(function (yes) {
+      if (!yes || activeModel !== model) return;
+      return fetch(api("/models/" + model.id), { method: "DELETE" }).then(function () {
+        if (viewer) viewer.clear();
+        activeModel = null;
+        renderTree(null);
+        showRemoveButton();
+        refreshModels();
+      });
     });
   }
 
@@ -423,16 +443,18 @@
     if (highest) setLod(String(highest));
   }
 
-  if (lodField) {
-    editor.addEventListener("change", function (event) {
-      if (!event.target.closest('[data-path="' + lodField + '"]')) return;
-      syncLodFromPlan();
-    });
-    editor.addEventListener("input", function (event) {
-      if (!event.target.closest('[data-path="' + lodField + '"]')) return;
-      syncLodFromPlan();
-    });
+  function onPlanEdit(event) {
+    if (!lodField || !event.target.closest('[data-path="' + lodField + '"]')) return;
+    syncLodFromPlan();
   }
+  editor.addEventListener("change", onPlanEdit);
+  editor.addEventListener("input", onPlanEdit);
+  // The section that drives the LOD may be the one just opened.
+  editor.addEventListener("bep:section", function () {
+    lodField = editor.getAttribute("data-lod-field") || "";
+    lodColumn = editor.getAttribute("data-lod-column") || "";
+    syncLodFromPlan();
+  });
   var syncBox = document.querySelector("[data-lod-sync]");
   if (syncBox) syncBox.addEventListener("change", function () { if (syncBox.checked) syncLodFromPlan(); });
 

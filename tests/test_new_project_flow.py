@@ -266,10 +266,10 @@ def test_the_loin_table_offers_the_schema_class_list(client, project):
 def test_the_viewer_toolbar_owns_the_model_remove_control(client, project):
     page = client.get(f"/p/{project.slug}/s/project_information").get_data(as_text=True)
     assert "data-viewer-upload" in page and "data-viewer-remove" in page
-    assert "viewer_delete_confirm" in page
+    assert "data-confirm-dialog" in page and "data-confirm-ok" in page
     js = client.get("/static/js/workspace.js").get_data(as_text=True)
     assert "data-model-delete" not in js and "removeActiveModel" in js
-    assert 'window.confirm(s("viewer_delete_confirm"' in js
+    assert "confirmRemoval" in js and 'dialog.returnValue === "confirm"' in js
 
 
 @pytest.mark.parametrize("framework_id", ["lite", "iso19650", "nbims_us"])
@@ -303,3 +303,25 @@ def test_every_framework_renders_scores_and_exports(client, framework_id):
         assert client.get(f"/p/{slug}/{page}").status_code == 200, (framework_id, page)
     for fmt in ("md", "html", "json", "docx"):
         assert client.get(f"/p/{slug}/export?format={fmt}").status_code == 200, (framework_id, fmt)
+
+
+def test_a_section_change_fetches_the_form_alone(client, project):
+    page = client.get(f"/p/{project.slug}/s/project_information").get_data(as_text=True)
+    assert 'data-section="project_information"' in page and "data-next-section" in page
+
+    body = client.get(f"/p/{project.slug}/s/team_roles?partial=1")
+    assert body.status_code == 200 and body.is_json
+    data = body.get_json()
+    assert data["section"] == "team_roles"
+    assert data["url"] == f"/p/{project.slug}/s/team_roles"
+    assert data["title"].endswith(project.name)
+    assert "<form" in data["form_html"] and "data-save-state" in data["form_html"]
+    assert "data-next-section" in data["form_html"]
+    assert "data-section-score" in data["assessment_html"]
+    assert client.get(f"/p/{project.slug}/s/nope?partial=1").status_code == 404
+
+    loin = client.get(f"/p/{project.slug}/s/information_requirements?partial=1").get_json()
+    assert loin["lod_field"] == "information_requirements.loin" and loin["lod_column"] == "lod"
+
+    js = client.get("/static/js/app.js").get_data(as_text=True)
+    assert "?partial=1" in js and "popstate" in js and "bep:section" in js

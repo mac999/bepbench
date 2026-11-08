@@ -170,11 +170,18 @@
   });
 
   // Tell the author up front if no model is reachable, rather than on first click.
-  fetch("/api/ai/status").then(function (r) { return r.json(); }).then(function (status) {
-    if (status.reachable) return;
+  var aiStatus = null;
+  function markOffline() {
+    if (!aiStatus || aiStatus.reachable) return;
     document.querySelectorAll("[data-ai-open]").forEach(function (button) {
       button.disabled = true;
-      button.title = status.reason || s("ai_offline", "No model available.");
+      button.title = aiStatus.reason || s("ai_offline", "No model available.");
     });
+  }
+  fetch("/api/ai/status").then(function (r) { return r.json(); }).then(function (status) {
+    aiStatus = status;
+    markOffline();
   }).catch(function () { /* leave the buttons enabled; the call itself will report */ });
+  // A section change brings new buttons and leaves no open panel behind.
+  editor.addEventListener("bep:section", function () { state = {}; markOffline(); });
 })();

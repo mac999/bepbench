@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% from "_field.html" import render as render_field %}
 {% block title %}{{ section.title }} — {{ project.name }}{% endblock %}
 {% block body_class %}app-shell{% endblock %}
 {% block menubar %}{% include "_menubar.html" %}{% endblock %}
@@ -70,46 +69,7 @@
   {% include "_project_nav.html" %}
 
   <main class="pane-bep" style="min-width:0">
-    <form method="post" action="{{ url_for('web.save_section', slug=project.slug, section_id=section.id) }}">
-      <div class="card">
-        <div class="card-head">
-          <div class="grow">
-            <div class="eyebrow">{{ t('common.section') }} {{ '%02d'|format(section_number) }}{% if section.reference %} · {{ section.reference }}{% endif %}</div>
-            <h2 style="margin-top:2px">{{ section.title }}</h2>
-          </div>
-          <span class="save-state" data-save-state data-state="saved">
-            <span class="dot"></span><span class="text">{{ t('editor.save.saved') }}</span>
-          </span>
-        </div>
-
-        <div class="card-body">
-          {% if section.intent %}<p class="section-intent">{{ section.intent }}</p>{% endif %}
-          {% if section.guidance %}
-            <div class="guidance" style="margin:12px 0 4px">{{ section.guidance }}</div>
-          {% endif %}
-
-          {% for field in section.fields %}
-            {{ render_field(section, field, values.get(field.id),
-                            section_score.fields | selectattr('field_id', 'equalto', field.id) | first) }}
-          {% endfor %}
-        </div>
-
-        <div class="card-head" style="border-top:1px solid var(--line-2);border-bottom:0">
-          {% if prev_section %}
-            <a class="btn sm" href="{{ url_for('web.editor', slug=project.slug, section_id=prev_section.id) }}">← {{ t('editor.prev') }}</a>
-          {% endif %}
-          <span class="grow"></span>
-          <noscript><button class="btn sm" type="submit">{{ t('editor.nojs_save') }}</button></noscript>
-          <span class="muted" style="font-size:11.5px"><kbd>⌘S</kbd> {{ t('editor.shortcut_save') }}</span>
-          {% if next_section %}
-            <a class="btn primary sm" data-next-section
-               href="{{ url_for('web.editor', slug=project.slug, section_id=next_section.id) }}">{{ t('editor.next') }} →</a>
-          {% else %}
-            <a class="btn primary sm" href="{{ url_for('web.score', slug=project.slug) }}">{{ t('project.score') }} →</a>
-          {% endif %}
-        </div>
-      </div>
-    </form>
+    {% include "_section_form.html" %}
   </main>
 
   <div class="splitter" data-splitter="left" role="separator" aria-orientation="vertical"

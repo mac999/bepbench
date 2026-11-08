@@ -3,6 +3,15 @@
 Versions follow semantic versioning: a minor number for new features, a patch number for
 fixes and documentation. Each version is tagged in git (`v0.4.0`).
 
+## 0.8.0 — 2026-11-08 — Section changes keep the viewer
+
+- Moving between sections (*Next section*, *Previous*, the section list, the Plan menu,
+  a recommendation link, ⌘↩) swaps the form and the *Assessment* tab in place instead of
+  reloading the page. The 3D view, the object tree, the selected element, the camera and the
+  LOD setting survive the move; the URL, the title and the browser history change as before.
+  `GET /p/<slug>/s/<section>?partial=1` serves the form as JSON.
+- *Remove model* confirms in the app's own dialog instead of the browser's.
+
 ## 0.7.3 — 2026-11-08 — Confirm before removing a model
 
 - *Remove model* asks for confirmation and names the file before deleting it.

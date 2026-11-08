@@ -9,6 +9,7 @@ from flask import (
     Response,
     abort,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -124,8 +125,7 @@ def editor(slug: str, section_id: str):
                 + f"#field-{ids_source['field']}"
                 if ids_source.get("section") and ids_source.get("field") else "")
 
-    return render_template(
-        "editor.html",
+    context = dict(
         loin_url=loin_url,
         project=project,
         framework=framework,
@@ -141,6 +141,19 @@ def editor(slug: str, section_id: str):
         lod_spec=lod_spec,
         models=services.list_models(project),
     )
+    if request.args.get("partial"):
+        # A section change swaps the form and the assessment tab in place, so the
+        # viewer, the object tree and the selection survive the move.
+        return jsonify({
+            "section": section.id,
+            "title": f"{section.title} — {project.name}",
+            "url": url_for("web.editor", slug=project.slug, section_id=section.id),
+            "lod_field": lod_field,
+            "lod_column": lod_spec.get("column", ""),
+            "form_html": render_template("_section_form.html", **context),
+            "assessment_html": render_template("_rail_body.html", **context),
+        })
+    return render_template("editor.html", **context)
 
 
 @web_bp.post("/p/<slug>/s/<section_id>")
