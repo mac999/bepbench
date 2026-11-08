@@ -251,8 +251,9 @@ on the pod, with port 8080 exposed. It puts the data on the persistent volume an
 basic authentication, because the proxy URL is public.
 
 Fly.io config is included (`fly.toml`): a mounted volume at `/data`, a `/healthz` check, and
-suspend-when-idle so an occasional-use instance costs close to nothing. Details and sizing
-guidance in [docs/05-deployment.md](docs/05-deployment.md).
+suspend-when-idle so an occasional-use instance costs close to nothing. A pushed `v*` tag
+runs the tests and deploys through GitHub Actions. Details and sizing guidance in
+[docs/05-deployment.md](docs/05-deployment.md).
 
 ---
 
@@ -291,11 +292,12 @@ bepkit/
 
 ```bash
 pip install -e ".[dev]"
-pytest -q        # 218 tests
+pytest -q               # 218 tests
+BEP_PERF=1 pytest -q    # + 2 performance budget tests (synthetic 1,000-element model)
 ```
 
 Optional-dependency tests skip when the dependency is absent. No test needs a model server
-or a network.
+or a network. The performance budget lives in the `perf` settings; CI runs it on every push.
 
 ## Standards
 
@@ -306,6 +308,7 @@ BIMForum LOD Specification · buildingSMART IDS 1.0 · IFC2X3 / IFC4
 
 | Version | Date | Change |
 | --- | --- | --- |
+| 0.9.0 | 2026-11-08 | GitHub Actions tests and tag deploys; performance budget |
 | 0.8.2 | 2026-11-08 | Section rail toggle works on narrower screens |
 | 0.8.1 | 2026-11-08 | Section rail toggle is labelled |
 | 0.8.0 | 2026-11-08 | Section changes keep the viewer, tree and selection |

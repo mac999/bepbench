@@ -289,7 +289,11 @@
     "include_subtypes": true,
     "_include_subtypes_comment": "An IDS entity facet matches its class exactly. When true, a requirement on IfcWall also applies to its instantiable subtypes (IfcWallStandardCase), those defined in every target schema.",
     "class_root": "IfcProduct",
-    "class_schemas": ["IFC2X3", "IFC4", "IFC4X3_ADD2"],
+    "class_schemas": [
+      "IFC2X3",
+      "IFC4",
+      "IFC4X3_ADD2"
+    ],
     "_class_comment": "The pick list offered in the table's IFC Class column and printed by bep ids classes: every instantiable class under class_root in any of class_schemas. A typed name none of them defines is marked, not refused.",
     "required_attributes": [
       "Name"
@@ -427,5 +431,13 @@
       "ids.milestone",
       "ids.default_pset"
     ]
+  },
+  "perf": {
+    "_comment": "Performance regression budget; tests/test_perf.py runs when BEP_PERF=1.",
+    "elements": 1000,
+    "max_generate_seconds": 30,
+    "max_tessellate_seconds_per_1000": 6,
+    "max_buffer_bytes_per_element": 2000,
+    "max_index_bytes_per_element": 400
   }
 }

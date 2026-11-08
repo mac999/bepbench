@@ -31,6 +31,15 @@ fly secrets set BEP_AUTH_USER=bep BEP_AUTH_PASSWORD=<password>
 when idle (`auto_stop_machines = "suspend"`, `min_machines_running = 0`), so an occasional-use
 instance costs close to nothing and wakes on the next request.
 
+**Automatic deployment.** Pushing a version tag (`git tag v0.9.0 && git push --tags`) runs
+the GitHub Actions workflow in `.github/workflows/deploy.yml`: the full test suite, then
+`flyctl deploy --remote-only`, then a `/healthz` probe. It needs one repository secret,
+`FLY_API_TOKEN`, made with `flyctl tokens create deploy -a bepbench` and added under
+*Settings → Secrets and variables → Actions*. The token is scoped to that one app. Every
+push to `main` and every pull request runs the tests alone (`ci.yml`). Actions minutes are
+free for a public repository; the remote builder is a Fly machine that stops after the build,
+so the deploy itself adds nothing to the monthly bill.
+
 **Sizing.** The default is `shared-cpu-1x` with 1 GB, because IFC tessellation is the memory
 peak, not request serving. A 200 MB IFC wants 2 GB. Size the volume for the models you expect
 to keep, not just the database.

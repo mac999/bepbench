@@ -118,9 +118,10 @@ Cheap substitute that captures most of the value: **a read-only share link plus 
 
 ### 6. Performance regression tests — prerequisite for 1–3
 
-Generate synthetic IFC files at 1k / 10k / 50k elements, record tessellation time, payload
-size and draw-call count, and fail the build when a threshold is crossed. Without this,
-every optimisation below is an unverifiable claim.
+Done in 0.9.0 at the first size: `tests/test_perf.py` generates a 1,000-wall model
+(`bepkit/ifcio/synthetic.py`), times tessellation and measures payload per element, and
+fails when the `perf.*` budget is crossed. CI runs it on every push. The 10k and 50k sizes
+and the draw-call count wait for task 1, which is what they measure.
 
 - Effort: **small**
 - Risk: none; it is the safety net for everything else

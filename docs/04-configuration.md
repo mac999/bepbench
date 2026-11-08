@@ -117,6 +117,18 @@ same name, on `bep ids export`, `bep ids check` and the HTTP API.
 | `ids.class_hints` | | Words in an element name mapped to an IFC class when none is stated |
 | `ids.class_root`, `ids.class_schemas` | `bep ids classes --schema` | The pick list in the table's IFC Class column: every instantiable class under the root, in any listed schema |
 
+## `perf`
+
+The budget `BEP_PERF=1 pytest` holds the IFC path to, on a synthetic model.
+
+| Key | Meaning |
+| --- | --- |
+| `perf.elements` | Elements in the generated model (1000) |
+| `perf.max_generate_seconds` | Budget for writing it with ifcopenshell |
+| `perf.max_tessellate_seconds_per_1000` | Tessellation time per thousand elements |
+| `perf.max_buffer_bytes_per_element` | Geometry buffer size per element |
+| `perf.max_index_bytes_per_element` | `index.json` size per element |
+
 ## `cli`
 
 | Key | Meaning |

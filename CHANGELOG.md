@@ -3,6 +3,13 @@
 Versions follow semantic versioning: a minor number for new features, a patch number for
 fixes and documentation. Each version is tagged in git (`v0.4.0`).
 
+## 0.9.0 — 2026-11-08 — Continuous tests and tag deploys
+
+- GitHub Actions runs the test suite on every push and pull request, and a pushed `v*` tag
+  runs it again and deploys to Fly.io (`FLY_API_TOKEN` secret), then probes `/healthz`.
+- Performance budget: `BEP_PERF=1 pytest` generates a 1,000-wall IFC and fails when
+  tessellation time or payload per element crosses the `perf.*` settings.
+
 ## 0.8.2 — 2026-11-08 — Section rail on narrower screens
 
 - Under 1500px (a zoomed browser counts) the section rail starts hidden but *☰ Sections*
