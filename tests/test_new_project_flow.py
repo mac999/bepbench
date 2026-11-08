@@ -325,3 +325,9 @@ def test_a_section_change_fetches_the_form_alone(client, project):
 
     js = client.get("/static/js/app.js").get_data(as_text=True)
     assert "?partial=1" in js and "popstate" in js and "bep:section" in js
+
+
+def test_the_section_rail_toggle_is_labelled(client, project):
+    page = client.get(f"/p/{project.slug}/s/project_information").get_data(as_text=True)
+    assert 'data-toggle-nav' in page and '☰ Sections</button>' in page
+    assert '.nav-toggle[aria-pressed="true"]' in client.get("/static/css/app.css").get_data(as_text=True)

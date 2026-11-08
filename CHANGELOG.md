@@ -3,6 +3,11 @@
 Versions follow semantic versioning: a minor number for new features, a patch number for
 fixes and documentation. Each version is tagged in git (`v0.4.0`).
 
+## 0.8.1 — 2026-11-08 — Labelled section rail toggle
+
+- The button that hides or shows the section rail now reads *☰ Sections* and is
+  highlighted while the rail is shown, instead of a bare icon.
+
 ## 0.8.0 — 2026-11-08 — Section changes keep the viewer
 
 - Moving between sections (*Next section*, *Previous*, the section list, the Plan menu,

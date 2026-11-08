@@ -484,6 +484,8 @@ body.app-shell { overflow: hidden; }
   background: var(--line); border-radius: 99px; border: 3px solid var(--bg);
 }
 .workspace.triple > *:hover::-webkit-scrollbar-thumb { background: var(--empty); }
+/* The toggle reads as "on" while the section rail is shown. */
+.nav-toggle[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); }
 body.nav-hidden .workspace.triple { --nav-w: 0px; }
 body.nav-hidden .workspace.triple > .sidenav { display: none; }
 

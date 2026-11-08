@@ -82,12 +82,17 @@
   });
 
   var navToggle = document.querySelector("[data-toggle-nav]");
+  function paintNavToggle() {
+    if (navToggle) navToggle.setAttribute("aria-pressed", String(!document.body.classList.contains("nav-hidden")));
+  }
   if (navToggle) {
     if (layout.navHidden) document.body.classList.add("nav-hidden");
+    paintNavToggle();
     navToggle.addEventListener("click", function () {
       document.body.classList.toggle("nav-hidden");
       layout.navHidden = document.body.classList.contains("nav-hidden");
       saveLayout(layout);
+      paintNavToggle();
       if (window.__bepViewer) window.__bepViewer.resize();
     });
   }
@@ -663,6 +668,7 @@
       document.body.classList.remove("nav-hidden");
       layout = {};
       saveLayout(layout);
+      paintNavToggle();
       if (viewer) viewer.resize();
     } else if (action === "lod-follow") {
       var sync = document.querySelector("[data-lod-sync]");

@@ -2,7 +2,7 @@
 {% block title %}{{ section.title }} — {{ project.name }}{% endblock %}
 {% block body_class %}app-shell{% endblock %}
 {% block menubar %}{% include "_menubar.html" %}{% endblock %}
-{% block topnav %}<button class="btn ghost sm" data-toggle-nav title="{{ t('menu.toggle_nav') }}" aria-label="{{ t('menu.toggle_nav') }}">☰</button>{% endblock %}
+{% block topnav %}<button class="btn ghost sm nav-toggle" data-toggle-nav title="{{ t('menu.toggle_nav') }}" aria-pressed="true">☰ {{ t('editor.sections') }}</button>{% endblock %}
 {% block crumbs %}{% include "_project_tabs.html" %}{% endblock %}
 
 {% block body %}
