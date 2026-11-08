@@ -302,6 +302,7 @@
 
   function removeActiveModel() {
     if (!activeModel) return;
+    if (!window.confirm(s("viewer_delete_confirm", "Remove this model?") + "\n" + activeModel.filename)) return;
     fetch(api("/models/" + activeModel.id), { method: "DELETE" }).then(function () {
       if (viewer) viewer.clear();
       activeModel = null;

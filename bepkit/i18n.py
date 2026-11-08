@@ -289,6 +289,7 @@ CATALOG: dict[str, dict[str, str]] = {
         "viewer.lod_sync": "Follows the LOD set in this section",
         "viewer.truncated": "Large model — only the first elements were tessellated.",
         "viewer.delete": "Remove model",
+        "viewer.delete_confirm": "Remove this model from the plan? The file and its check results are deleted.",
         "viewer.elements": "elements",
     },
     "ko": {
@@ -564,6 +565,7 @@ CATALOG: dict[str, dict[str, str]] = {
         "viewer.lod_sync": "이 섹션에서 설정한 LOD를 따릅니다",
         "viewer.truncated": "대용량 모델 — 앞부분 요소만 변환되었습니다.",
         "viewer.delete": "모델 제거",
+        "viewer.delete_confirm": "이 모델을 계획서에서 제거할까요? 파일과 검사 결과가 삭제됩니다.",
         "viewer.elements": "개 요소",
     },
 }

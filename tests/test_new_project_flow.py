@@ -266,5 +266,40 @@ def test_the_loin_table_offers_the_schema_class_list(client, project):
 def test_the_viewer_toolbar_owns_the_model_remove_control(client, project):
     page = client.get(f"/p/{project.slug}/s/project_information").get_data(as_text=True)
     assert "data-viewer-upload" in page and "data-viewer-remove" in page
+    assert "viewer_delete_confirm" in page
     js = client.get("/static/js/workspace.js").get_data(as_text=True)
     assert "data-model-delete" not in js and "removeActiveModel" in js
+    assert 'window.confirm(s("viewer_delete_confirm"' in js
+
+
+@pytest.mark.parametrize("framework_id", ["lite", "iso19650", "nbims_us"])
+def test_every_framework_renders_scores_and_exports(client, framework_id):
+    from bepkit.schema import get_framework
+
+    framework = get_framework(framework_id)
+    response = client.post("/projects", data={"name": f"Plan {framework_id}", "framework": framework_id,
+                                              "client": "Acme", "reference": "P-1"})
+    assert response.status_code == 302
+    slug = f"plan-{framework_id.replace('_', '-')}"
+
+    for section in framework.sections:
+        for lang in ("en", "ko"):
+            client.set_cookie("bep_lang", lang)
+            page = client.get(f"/p/{slug}/s/{section.id}")
+            assert page.status_code == 200, (framework_id, section.id, lang)
+            html = page.get_data(as_text=True)
+            for field in section.fields:
+                assert f'data-path="{section.id}.{field.id}"' in html or field.id in html, \
+                    (framework_id, section.id, field.id)
+    client.set_cookie("bep_lang", "en")
+
+    api = client.get(f"/api/frameworks/{framework_id}").get_json()
+    assert len(api["sections"]) == len(framework.sections)
+    assert sum(len(s["fields"]) for s in api["sections"]) == framework.total_fields
+
+    score = client.get(f"/api/projects/{slug}/score").get_json()
+    assert 0 <= score["score"] <= 100
+    for page in ("score", "preview", "document", "settings"):
+        assert client.get(f"/p/{slug}/{page}").status_code == 200, (framework_id, page)
+    for fmt in ("md", "html", "json", "docx"):
+        assert client.get(f"/p/{slug}/export?format={fmt}").status_code == 200, (framework_id, fmt)

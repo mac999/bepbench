@@ -3,6 +3,12 @@
 Versions follow semantic versioning: a minor number for new features, a patch number for
 fixes and documentation. Each version is tagged in git (`v0.4.0`).
 
+## 0.7.3 — 2026-11-08 — Confirm before removing a model
+
+- *Remove model* asks for confirmation and names the file before deleting it.
+- New test renders every section of every framework in both languages, scores it and
+  exports it in all four formats.
+
 ## 0.7.2 — 2026-11-08 — Remove model from the viewer toolbar
 
 - *Remove model* sits next to *Upload IFC* in the viewer toolbar and acts on the shown
