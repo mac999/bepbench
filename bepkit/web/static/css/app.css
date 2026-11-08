@@ -489,7 +489,12 @@ body.app-shell { overflow: hidden; }
 body.nav-hidden .workspace.triple { --nav-w: 0px; }
 body.nav-hidden .workspace.triple > .sidenav { display: none; }
 
-@media (max-width: 1500px) { .workspace.triple { --nav-w: 0px; } .workspace.triple > .sidenav { display: none; } }
+/* Under 1500px the rail starts hidden to leave room for the model; the
+   Sections toggle still brings it back (body.nav-shown). */
+@media (max-width: 1500px) {
+  body:not(.nav-shown) .workspace.triple { --nav-w: 0px; }
+  body:not(.nav-shown) .workspace.triple > .sidenav { display: none; }
+}
 @media (max-width: 1100px) {
   /* Stacked: hand scrolling back to the page, or the panes fight each other. */
   body.app-shell { overflow: auto; }
@@ -503,6 +508,7 @@ body.nav-hidden .workspace.triple > .sidenav { display: none; }
   .workspace.triple > .pane-right {
     height: auto; overflow: visible; grid-column: 1;
   }
+  .workspace.triple > .sidenav { display: none; }
   .workspace.triple > .pane-model,
   .workspace.triple > .pane-right { margin-top: 14px; }
   .viewer-canvas { height: clamp(320px, 60vh, 700px); flex: none; }

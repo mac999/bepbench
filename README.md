@@ -306,6 +306,7 @@ BIMForum LOD Specification · buildingSMART IDS 1.0 · IFC2X3 / IFC4
 
 | Version | Date | Change |
 | --- | --- | --- |
+| 0.8.2 | 2026-11-08 | Section rail toggle works on narrower screens |
 | 0.8.1 | 2026-11-08 | Section rail toggle is labelled |
 | 0.8.0 | 2026-11-08 | Section changes keep the viewer, tree and selection |
 | 0.7.3 | 2026-11-08 | Remove model asks first; every framework tested end to end |

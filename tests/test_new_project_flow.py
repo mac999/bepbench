@@ -330,4 +330,9 @@ def test_a_section_change_fetches_the_form_alone(client, project):
 def test_the_section_rail_toggle_is_labelled(client, project):
     page = client.get(f"/p/{project.slug}/s/project_information").get_data(as_text=True)
     assert 'data-toggle-nav' in page and '☰ Sections</button>' in page
-    assert '.nav-toggle[aria-pressed="true"]' in client.get("/static/css/app.css").get_data(as_text=True)
+    css = client.get("/static/css/app.css").get_data(as_text=True)
+    assert '.nav-toggle[aria-pressed="true"]' in css
+    # A narrow viewport hides the rail by default, but the toggle can still show it.
+    assert "body:not(.nav-shown) .workspace.triple > .sidenav { display: none; }" in css
+    js = client.get("/static/js/workspace.js").get_data(as_text=True)
+    assert 'layout.nav = navShown() ? "hidden" : "shown"' in js

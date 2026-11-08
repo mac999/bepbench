@@ -82,19 +82,31 @@
   });
 
   var navToggle = document.querySelector("[data-toggle-nav]");
+  var sidenav = document.querySelector(".workspace.triple > .sidenav");
+  // The rail's real visibility: a narrow viewport hides it on its own, so the
+  // toggle reflects what is on screen, not only the saved preference.
+  function navShown() {
+    return !!sidenav && getComputedStyle(sidenav).display !== "none";
+  }
   function paintNavToggle() {
-    if (navToggle) navToggle.setAttribute("aria-pressed", String(!document.body.classList.contains("nav-hidden")));
+    if (navToggle) navToggle.setAttribute("aria-pressed", String(navShown()));
+  }
+  function applyNavPreference() {
+    document.body.classList.toggle("nav-hidden", layout.nav === "hidden");
+    document.body.classList.toggle("nav-shown", layout.nav === "shown");
+    paintNavToggle();
   }
   if (navToggle) {
-    if (layout.navHidden) document.body.classList.add("nav-hidden");
-    paintNavToggle();
+    if (layout.navHidden) layout.nav = "hidden";   // saved by earlier versions
+    applyNavPreference();
     navToggle.addEventListener("click", function () {
-      document.body.classList.toggle("nav-hidden");
-      layout.navHidden = document.body.classList.contains("nav-hidden");
+      layout.nav = navShown() ? "hidden" : "shown";
+      delete layout.navHidden;
       saveLayout(layout);
-      paintNavToggle();
+      applyNavPreference();
       if (window.__bepViewer) window.__bepViewer.resize();
     });
+    window.addEventListener("resize", paintNavToggle);
   }
 
   /* ---------------- right-hand tabs ---------------- */
@@ -665,10 +677,9 @@
     } else if (action === "reset-layout") {
       editor.style.removeProperty("--bep-w");
       editor.style.removeProperty("--props-w");
-      document.body.classList.remove("nav-hidden");
       layout = {};
       saveLayout(layout);
-      paintNavToggle();
+      applyNavPreference();
       if (viewer) viewer.resize();
     } else if (action === "lod-follow") {
       var sync = document.querySelector("[data-lod-sync]");

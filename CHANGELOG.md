@@ -3,6 +3,12 @@
 Versions follow semantic versioning: a minor number for new features, a patch number for
 fixes and documentation. Each version is tagged in git (`v0.4.0`).
 
+## 0.8.2 — 2026-11-08 — Section rail on narrower screens
+
+- Under 1500px (a zoomed browser counts) the section rail starts hidden but *☰ Sections*
+  now brings it back; before, the toggle had no effect there. The button shows the rail's
+  real state. On stacked layouts under 1100px the rail stays hidden.
+
 ## 0.8.1 — 2026-11-08 — Labelled section rail toggle
 
 - The button that hides or shows the section rail now reads *☰ Sections* and is
