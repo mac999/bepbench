@@ -291,7 +291,7 @@ bepkit/
 
 ```bash
 pip install -e ".[dev]"
-pytest -q        # 212 tests
+pytest -q        # 216 tests
 ```
 
 Optional-dependency tests skip when the dependency is absent. No test needs a model server
